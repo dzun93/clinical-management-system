@@ -1,0 +1,703 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================
+       ENCABEZADO
+    ========================== */
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .dashboard-header p {
+        color: #718096;
+        font-size: 13px;
+    }
+
+
+    /* ==========================
+       INDICADORES
+    ========================== */
+
+    .dashboard-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .summary-label {
+        color: #718096;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .summary-description {
+        color: #8a98a5;
+        font-size: 11px;
+    }
+
+
+    /* ==========================
+       GRID PRINCIPAL
+    ========================== */
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 20px;
+    }
+
+    .dashboard-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .dashboard-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+
+        padding: 16px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .dashboard-card-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .dashboard-card-body {
+        padding: 0;
+    }
+
+
+    /* ==========================
+       TABLAS
+    ========================== */
+
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .dashboard-table th {
+        text-align: left;
+        padding: 11px 15px;
+
+        background-color: #f7fafc;
+        color: #718096;
+
+        font-size: 10px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .dashboard-table td {
+        padding: 14px 15px;
+
+        color: #37474f;
+        font-size: 12px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .dashboard-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .dashboard-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .patient-name {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .secondary-text {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .code {
+        color: #245b82;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       ESTADOS
+    ========================== */
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 11px;
+
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .status-programada {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+    .status-confirmada {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .status-completada {
+        background-color: #e7f4ea;
+        color: #25633c;
+    }
+
+    .status-cancelada {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .status-no-asistio {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+
+    /* ==========================
+       SIN REGISTROS
+    ========================== */
+
+    .empty-state {
+        padding: 40px 25px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 12px;
+    }
+
+
+    /* ==========================
+       ACCESOS RÁPIDOS
+    ========================== */
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .quick-action {
+        display: block;
+
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 17px 18px;
+
+        text-decoration: none;
+
+        transition: 0.15s ease;
+    }
+
+    .quick-action:hover {
+        border-color: #b7c7d4;
+        transform: translateY(-1px);
+    }
+
+    .quick-action-title {
+        color: #16324f;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .quick-action-description {
+        color: #718096;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+
+    @media (max-width: 1000px) {
+
+        .dashboard-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <h1>Dashboard</h1>
+
+        <p>
+            Resumen general de la actividad clínica del consultorio.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- INDICADORES -->
+
+<div class="dashboard-summary">
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Pacientes activos
+        </div>
+
+        <div class="summary-value">
+            {{ total_pacientes }}
+        </div>
+
+        <div class="summary-description">
+            Pacientes registrados actualmente en el sistema.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Consultas médicas
+        </div>
+
+        <div class="summary-value">
+            {{ total_consultas }}
+        </div>
+
+        <div class="summary-description">
+            Total de consultas clínicas registradas.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Citas de hoy
+        </div>
+
+        <div class="summary-value">
+            {{ citas_hoy }}
+        </div>
+
+        <div class="summary-description">
+            {{ hoy|date:"d/m/Y" }}
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- INFORMACIÓN PRINCIPAL -->
+
+<div class="dashboard-grid">
+
+
+    <!-- PRÓXIMAS CITAS -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <h2>
+                Próximas citas
+            </h2>
+
+            <a
+                href="{% url 'agenda_citas' %}"
+                class="btn btn-secondary"
+            >
+                Ver agenda
+            </a>
+
+        </div>
+
+
+        <div class="dashboard-card-body">
+
+
+            {% if proximas_citas %}
+
+                <table class="dashboard-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Paciente</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for cita in proximas_citas %}
+
+                            <tr>
+
+                                <td>
+                                    {{ cita.fecha_cita|date:"d/m/Y" }}
+                                </td>
+
+
+                                <td>
+                                    {{ cita.hora_cita|time:"H:i" }}
+                                </td>
+
+
+                                <td>
+
+                                    <div class="patient-name">
+
+                                        {{ cita.paciente.nombres }}
+                                        {{ cita.paciente.apellidos }}
+
+                                    </div>
+
+                                    <div class="secondary-text">
+                                        {{ cita.motivo|truncatechars:35 }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if cita.estado == "PROGRAMADA" %}
+
+                                        <span class="status-badge status-programada">
+                                            Programada
+                                        </span>
+
+                                    {% elif cita.estado == "CONFIRMADA" %}
+
+                                        <span class="status-badge status-confirmada">
+                                            Confirmada
+                                        </span>
+
+                                    {% elif cita.estado == "COMPLETADA" %}
+
+                                        <span class="status-badge status-completada">
+                                            Completada
+                                        </span>
+
+                                    {% elif cita.estado == "CANCELADA" %}
+
+                                        <span class="status-badge status-cancelada">
+                                            Cancelada
+                                        </span>
+
+                                    {% elif cita.estado == "NO_ASISTIO" %}
+
+                                        <span class="status-badge status-no-asistio">
+                                            No asistió
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'detalle_cita' cita.id %}"
+                                        class="btn btn-secondary"
+                                    >
+                                        Ver
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>
+                        No hay próximas citas
+                    </h3>
+
+                    <p>
+                        No existen citas futuras pendientes en la agenda.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+    <!-- CONSULTAS RECIENTES -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <h2>
+                Consultas recientes
+            </h2>
+
+        </div>
+
+
+        <div class="dashboard-card-body">
+
+
+            {% if consultas_recientes %}
+
+                <table class="dashboard-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Consulta</th>
+                            <th>Paciente</th>
+                            <th></th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for consulta in consultas_recientes %}
+
+                            <tr>
+
+                                <td>
+
+                                    <span class="code">
+                                        {{ consulta.codigo_consulta }}
+                                    </span>
+
+                                    <div class="secondary-text">
+                                        {{ consulta.fecha_consulta|date:"d/m/Y" }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="patient-name">
+
+                                        {{ consulta.expediente.paciente.nombres }}
+                                        {{ consulta.expediente.paciente.apellidos }}
+
+                                    </div>
+
+                                    <div class="secondary-text">
+                                        {{ consulta.motivo_consulta|truncatechars:35 }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'detalle_consulta' consulta.expediente.paciente.id consulta.id %}"
+                                        class="btn btn-secondary"
+                                    >
+                                        Ver
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>
+                        No hay consultas registradas
+                    </h3>
+
+                    <p>
+                        Las consultas médicas recientes aparecerán aquí.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- ACCESOS RÁPIDOS -->
+
+<div class="quick-actions">
+
+
+    <a
+        href="{% url 'lista_pacientes' %}"
+        class="quick-action"
+    >
+
+        <div class="quick-action-title">
+            Pacientes
+        </div>
+
+        <div class="quick-action-description">
+            Consulte pacientes registrados o agregue una nueva paciente.
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'agenda_citas' %}"
+        class="quick-action"
+    >
+
+        <div class="quick-action-title">
+            Agenda de Citas
+        </div>
+
+        <div class="quick-action-description">
+            Consulte citas programadas, confirmadas y próximas atenciones.
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'lista_pacientes' %}"
+        class="quick-action"
+    >
+
+        <div class="quick-action-title">
+            Gestión Clínica
+        </div>
+
+        <div class="quick-action-description">
+            Acceda a expedientes, consultas e historial clínico desde las pacientes.
+        </div>
+
+    </a>
+
+
+</div>
+
+
+{% endblock %}

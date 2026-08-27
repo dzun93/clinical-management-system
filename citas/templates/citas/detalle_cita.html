@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+
+{% block title %}
+Detalle de cita | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .appointment-identity {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+    }
+
+    .patient-avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #dcebf5;
+        color: #245b82;
+
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .appointment-information h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .appointment-information p {
+        color: #718096;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .appointment-code {
+        display: inline-block;
+
+        margin-top: 7px;
+        padding: 5px 10px;
+
+        border-radius: 14px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+
+    /* ==========================
+       RESUMEN
+    ========================== */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 18px 20px;
+    }
+
+    .summary-label {
+        color: #718096;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       ESTADOS
+    ========================== */
+
+    .status-badge {
+        display: inline-block;
+
+        padding: 5px 10px;
+        border-radius: 12px;
+
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .status-programada {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+    .status-confirmada {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .status-completada {
+        background-color: #e7f4ea;
+        color: #25633c;
+    }
+
+    .status-cancelada {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .status-no-asistio {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+
+    /* ==========================
+       DETALLE
+    ========================== */
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .detail-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .detail-card.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .detail-card-header {
+        padding: 15px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .detail-card-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .detail-card-body {
+        padding: 20px;
+    }
+
+    .detail-text {
+        color: #37474f;
+        font-size: 14px;
+        line-height: 1.7;
+        white-space: pre-line;
+    }
+
+    .empty-value {
+        color: #9aa7b2;
+        font-size: 13px;
+        font-style: italic;
+    }
+
+
+    /* ==========================
+       INFORMACIÓN DEL REGISTRO
+    ========================== */
+
+    .record-info {
+        margin-top: 25px;
+
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        overflow: hidden;
+    }
+
+    .record-info-header {
+        padding: 15px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .record-info-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .record-info-body {
+        padding: 20px;
+    }
+
+    .data-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 15px;
+
+        padding: 13px 0;
+
+        border-bottom: 1px solid #edf1f4;
+    }
+
+    .data-row:last-child {
+        border-bottom: none;
+    }
+
+    .data-label {
+        color: #718096;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .data-value {
+        color: #263238;
+        font-size: 14px;
+    }
+
+
+    @media (max-width: 1000px) {
+
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+
+    @media (max-width: 800px) {
+
+        .appointment-header {
+            flex-direction: column;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-card.full-width {
+            grid-column: auto;
+        }
+
+        .data-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="appointment-header">
+
+    <div class="appointment-identity">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div class="appointment-information">
+
+            <h1>Detalle de Cita</h1>
+
+            <p>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </p>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="appointment-code">
+                {{ cita.codigo_cita }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a
+            href="{% url 'editar_cita' cita.id %}"
+            class="btn btn-primary"
+        >
+            Editar cita
+        </a>
+
+        <a
+            href="{% url 'lista_citas_paciente' paciente.id %}"
+            class="btn btn-secondary"
+        >
+            Citas de paciente
+        </a>
+
+        <a
+            href="{% url 'agenda_citas' %}"
+            class="btn btn-secondary"
+        >
+            Agenda general
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- RESUMEN -->
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Código
+        </div>
+
+        <div class="summary-value">
+            {{ cita.codigo_cita }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Fecha
+        </div>
+
+        <div class="summary-value">
+            {{ cita.fecha_cita|date:"d/m/Y" }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Hora
+        </div>
+
+        <div class="summary-value">
+            {{ cita.hora_cita|time:"H:i" }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Estado
+        </div>
+
+        <div class="summary-value">
+
+            {% if cita.estado == "PROGRAMADA" %}
+
+                <span class="status-badge status-programada">
+                    Programada
+                </span>
+
+            {% elif cita.estado == "CONFIRMADA" %}
+
+                <span class="status-badge status-confirmada">
+                    Confirmada
+                </span>
+
+            {% elif cita.estado == "COMPLETADA" %}
+
+                <span class="status-badge status-completada">
+                    Completada
+                </span>
+
+            {% elif cita.estado == "CANCELADA" %}
+
+                <span class="status-badge status-cancelada">
+                    Cancelada
+                </span>
+
+            {% elif cita.estado == "NO_ASISTIO" %}
+
+                <span class="status-badge status-no-asistio">
+                    No asistió
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- INFORMACIÓN PRINCIPAL -->
+
+<div class="detail-grid">
+
+
+    <!-- MOTIVO -->
+
+    <div class="detail-card full-width">
+
+        <div class="detail-card-header">
+            <h2>Motivo de la cita</h2>
+        </div>
+
+        <div class="detail-card-body">
+
+            <div class="detail-text">
+                {{ cita.motivo }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PACIENTE -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-header">
+            <h2>Paciente</h2>
+        </div>
+
+        <div class="detail-card-body">
+
+            <div class="detail-text">
+
+                <strong>
+                    {{ paciente.nombres }}
+                    {{ paciente.apellidos }}
+                </strong>
+
+                <br>
+
+                Identidad:
+                {{ paciente.numero_identidad }}
+
+                <br>
+
+                Teléfono:
+                {{ paciente.telefono }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROGRAMACIÓN -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-header">
+            <h2>Programación</h2>
+        </div>
+
+        <div class="detail-card-body">
+
+            <div class="detail-text">
+
+                Fecha:
+                {{ cita.fecha_cita|date:"d/m/Y" }}
+
+                <br>
+
+                Hora:
+                {{ cita.hora_cita|time:"H:i" }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- OBSERVACIONES -->
+
+    <div class="detail-card full-width">
+
+        <div class="detail-card-header">
+            <h2>Observaciones</h2>
+        </div>
+
+        <div class="detail-card-body">
+
+            {% if cita.observaciones %}
+
+                <div class="detail-text">
+                    {{ cita.observaciones }}
+                </div>
+
+            {% else %}
+
+                <span class="empty-value">
+                    No existen observaciones adicionales.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- INFORMACIÓN DEL REGISTRO -->
+
+<div class="record-info">
+
+    <div class="record-info-header">
+        <h2>Información del registro</h2>
+    </div>
+
+    <div class="record-info-body">
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Registrado por
+            </div>
+
+            <div class="data-value">
+
+                {% if cita.registrado_por %}
+
+                    {{ cita.registrado_por.get_full_name|default:cita.registrado_por.username }}
+
+                {% else %}
+
+                    <span class="empty-value">
+                        Usuario no registrado
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Fecha de creación
+            </div>
+
+            <div class="data-value">
+                {{ cita.fecha_creacion|date:"d/m/Y H:i" }}
+            </div>
+
+        </div>
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Última actualización
+            </div>
+
+            <div class="data-value">
+                {{ cita.fecha_actualizacion|date:"d/m/Y H:i" }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}
+Acceso Denegado | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .error-container {
+        min-height: 65vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 30px;
+    }
+
+    .error-card {
+        width: 100%;
+        max-width: 580px;
+
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 10px;
+
+        padding: 40px;
+
+        text-align: center;
+    }
+
+    .error-code {
+        color: #16324f;
+
+        font-size: 64px;
+        font-weight: bold;
+
+        line-height: 1;
+
+        margin-bottom: 10px;
+    }
+
+    .error-title {
+        color: #263238;
+
+        font-size: 22px;
+        font-weight: 600;
+
+        margin-bottom: 12px;
+    }
+
+    .error-description {
+        color: #718096;
+
+        font-size: 12px;
+        line-height: 1.7;
+
+        max-width: 430px;
+
+        margin: 0 auto 25px auto;
+    }
+
+    .error-info {
+        background-color: #f8fafb;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 6px;
+
+        padding: 13px 16px;
+
+        margin-bottom: 25px;
+
+        color: #61717e;
+
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .error-actions {
+        display: flex;
+        justify-content: center;
+
+        gap: 10px;
+
+        flex-wrap: wrap;
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="error-container">
+
+    <div class="error-card">
+
+        <div class="error-code">
+            403
+        </div>
+
+        <div class="error-title">
+            Acceso denegado
+        </div>
+
+        <div class="error-description">
+
+            Su cuenta no tiene los permisos necesarios para
+            acceder a este módulo del Sistema de Gestión Clínica.
+
+        </div>
+
+
+        <div class="error-info">
+
+            El acceso a determinadas funciones está restringido
+            según el rol asignado al usuario. Si considera que
+            debería tener acceso, comuníquese con el administrador
+            del sistema.
+
+        </div>
+
+
+        <div class="error-actions">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="btn btn-primary"
+            >
+                Volver al Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

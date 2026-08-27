@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block title %}
+Consultas médicas | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .consultas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .consultas-title h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .consultas-title p {
+        color: #718096;
+        font-size: 13px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+
+    /* =========================
+       PACIENTE
+    ========================= */
+
+    .patient-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 18px 22px;
+        margin-bottom: 25px;
+    }
+
+    .patient-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .patient-avatar {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 50%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-color: #dcebf5;
+        color: #245b82;
+
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .patient-data h2 {
+        color: #16324f;
+        font-size: 17px;
+        margin-bottom: 5px;
+    }
+
+    .patient-data p {
+        color: #718096;
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+    .record-code {
+        display: inline-block;
+
+        margin-top: 5px;
+        padding: 4px 9px;
+
+        border-radius: 12px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+
+    /* =========================
+       CONTADOR
+    ========================= */
+
+    .summary-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 15px;
+    }
+
+    .summary-bar h2 {
+        color: #16324f;
+        font-size: 16px;
+    }
+
+    .consultation-count {
+        color: #718096;
+        font-size: 12px;
+    }
+
+
+    /* =========================
+       TABLA
+    ========================= */
+
+    .table-container {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .consultations-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .consultations-table thead {
+        background-color: #f7fafc;
+    }
+
+    .consultations-table th {
+        text-align: left;
+        padding: 13px 16px;
+
+        color: #61717e;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .consultations-table td {
+        padding: 15px 16px;
+
+        color: #37474f;
+        font-size: 13px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .consultations-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .consultations-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .consultation-code {
+        color: #245b82;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .consultation-reason {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .diagnosis-preview {
+        color: #718096;
+        font-size: 12px;
+    }
+
+    .status-badge {
+        display: inline-block;
+
+        padding: 4px 9px;
+        border-radius: 12px;
+
+        background-color: #e8f5ee;
+        color: #28764b;
+
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+
+    /* =========================
+       SIN CONSULTAS
+    ========================= */
+
+    .empty-state {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 55px 30px;
+
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+
+        margin: 0 auto 15px;
+
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 17px;
+        margin-bottom: 7px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+
+    @media (max-width: 850px) {
+
+        .consultas-header {
+            flex-direction: column;
+        }
+
+        .patient-summary {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .consultations-table {
+            min-width: 750px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="consultas-header">
+
+    <div class="consultas-title">
+
+        <h1>Consultas Médicas</h1>
+
+        <p>
+            Historial cronológico de atenciones médicas de la paciente.
+        </p>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a
+            href="{% url 'detalle_expediente' paciente.id %}"
+            class="btn btn-secondary"
+        >
+            Volver al expediente
+        </a>
+
+        <a
+            href="{% url 'crear_consulta' paciente.id %}"
+            class="btn btn-primary"
+        >
+            + Nueva consulta
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- INFORMACIÓN DE LA PACIENTE -->
+
+<div class="patient-summary">
+
+    <div class="patient-info">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div class="patient-data">
+
+            <h2>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </h2>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="record-code">
+                {{ expediente.codigo_expediente }}
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- RESUMEN -->
+
+<div class="summary-bar">
+
+    <h2>Historial de consultas</h2>
+
+    <div class="consultation-count">
+
+        {{ consultas|length }}
+
+        {% if consultas|length == 1 %}
+            consulta registrada
+        {% else %}
+            consultas registradas
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- CONSULTAS -->
+
+{% if consultas %}
+
+    <div class="table-container">
+
+        <table class="consultations-table">
+
+            <thead>
+
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Motivo de consulta</th>
+                    <th>Diagnóstico</th>
+                    <th>Próxima cita</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for consulta in consultas %}
+
+                    <tr>
+
+                        <td>
+                            <span class="consultation-code">
+                                {{ consulta.codigo_consulta }}
+                            </span>
+                        </td>
+
+
+                        <td>
+                            {{ consulta.fecha_consulta|date:"d/m/Y" }}
+
+                            <br>
+
+                            <span class="diagnosis-preview">
+                                {{ consulta.fecha_consulta|date:"H:i" }}
+                            </span>
+                        </td>
+
+
+                        <td>
+                            <div class="consultation-reason">
+                                {{ consulta.motivo_consulta|truncatechars:55 }}
+                            </div>
+                        </td>
+
+
+                        <td>
+                            <span class="diagnosis-preview">
+                                {{ consulta.diagnostico|truncatechars:60 }}
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            {% if consulta.proxima_cita %}
+
+                                {{ consulta.proxima_cita|date:"d/m/Y" }}
+
+                            {% else %}
+
+                                <span class="diagnosis-preview">
+                                    No programada
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status-badge">
+                                Registrada
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <a
+                                href="{% url 'detalle_consulta' paciente.id consulta.id %}"
+                                class="btn btn-secondary"
+                            >
+                                Ver detalle
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+{% else %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            +
+        </div>
+
+        <h3>
+            No hay consultas médicas registradas
+        </h3>
+
+        <p>
+            Esta paciente todavía no tiene atenciones médicas
+            registradas en su expediente.
+        </p>
+
+        <a
+            href="{% url 'crear_consulta' paciente.id %}"
+            class="btn btn-primary"
+        >
+            + Registrar primera consulta
+        </a>
+
+    </div>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+
+

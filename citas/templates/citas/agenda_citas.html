@@ -1,0 +1,709 @@
+{% extends "base.html" %}
+
+{% block title %}
+Agenda de Citas | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .agenda-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .agenda-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .agenda-header p {
+        color: #718096;
+        font-size: 13px;
+    }
+
+
+    /* ==========================
+       RESUMEN
+    ========================== */
+
+    .agenda-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 18px 20px;
+    }
+
+    .summary-label {
+        color: #718096;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       TABLA
+    ========================== */
+
+    .table-container {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .appointments-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .appointments-table thead {
+        background-color: #f7fafc;
+    }
+
+    .appointments-table th {
+        padding: 13px 16px;
+        text-align: left;
+
+        color: #61717e;
+
+        font-size: 11px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .appointments-table td {
+        padding: 15px 16px;
+
+        color: #37474f;
+        font-size: 13px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .appointments-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .appointments-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .appointment-code {
+        color: #245b82;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .patient-name {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .patient-id {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .appointment-time {
+        color: #16324f;
+        font-weight: bold;
+    }
+
+    .appointment-reason {
+        color: #54636e;
+        font-size: 12px;
+    }
+
+
+    /* ==========================
+       ESTADOS
+    ========================== */
+
+    .status-badge {
+        display: inline-block;
+
+        padding: 5px 9px;
+        border-radius: 12px;
+
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .status-programada {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+    .status-confirmada {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .status-completada {
+        background-color: #e7f4ea;
+        color: #25633c;
+    }
+
+    .status-cancelada {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .status-no-asistio {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+
+    /* ==========================
+       SIN CITAS
+    ========================== */
+
+    .empty-state {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 60px 30px;
+
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+
+        margin: 0 auto 15px;
+
+        border-radius: 50%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 17px;
+        margin-bottom: 7px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 13px;
+    }
+/* ==========================
+   FILTROS
+========================== */
+
+.filters-card {
+    background-color: white;
+    border: 1px solid #e1e7ec;
+    border-radius: 8px;
+
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    color: #34495e;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid #cfd8e0;
+    border-radius: 5px;
+
+    background-color: white;
+    color: #263238;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    outline: none;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: #245b82;
+    box-shadow: 0 0 0 3px rgba(36, 91, 130, 0.12);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+}
+
+    @media (max-width: 950px) {
+.filters-form {
+    grid-template-columns: 1fr;
+}
+        .agenda-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .appointments-table {
+            min-width: 900px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="agenda-header">
+
+    <div>
+
+        <h1>Agenda de Citas</h1>
+
+        <p>
+            Consulte y administre las citas programadas
+            para las pacientes del consultorio.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- RESUMEN -->
+
+<div class="agenda-summary">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Total de citas
+        </div>
+
+        <div class="summary-value">
+            {{ total_citas }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Programadas
+        </div>
+
+        <div class="summary-value">
+            {{ citas_programadas }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Confirmadas
+        </div>
+
+        <div class="summary-value">
+            {{ citas_confirmadas }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Citas de hoy
+        </div>
+
+        <div class="summary-value">
+            {{ citas_hoy }}
+        </div>
+
+        <div
+            style="
+                color: #718096;
+                font-size: 11px;
+                margin-top: 5px;
+            "
+        >
+            {{ hoy|date:"d/m/Y" }}
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FILTROS -->
+
+<div class="filters-card">
+
+    <form
+        method="GET"
+        class="filters-form"
+    >
+
+        <!-- FECHA -->
+
+        <div class="filter-group">
+
+            <label for="fecha">
+                Fecha
+            </label>
+
+            <input
+                type="date"
+                id="fecha"
+                name="fecha"
+                value="{{ fecha_filtro }}"
+            >
+
+        </div>
+
+
+        <!-- ESTADO -->
+
+        <div class="filter-group">
+
+            <label for="estado">
+                Estado
+            </label>
+
+            <select
+                id="estado"
+                name="estado"
+            >
+
+                <option value="">
+                    Todos los estados
+                </option>
+
+                <option
+                    value="PROGRAMADA"
+                    {% if estado_filtro == "PROGRAMADA" %}
+                        selected
+                    {% endif %}
+                >
+                    Programada
+                </option>
+
+                <option
+                    value="CONFIRMADA"
+                    {% if estado_filtro == "CONFIRMADA" %}
+                        selected
+                    {% endif %}
+                >
+                    Confirmada
+                </option>
+
+                <option
+                    value="COMPLETADA"
+                    {% if estado_filtro == "COMPLETADA" %}
+                        selected
+                    {% endif %}
+                >
+                    Completada
+                </option>
+
+                <option
+                    value="CANCELADA"
+                    {% if estado_filtro == "CANCELADA" %}
+                        selected
+                    {% endif %}
+                >
+                    Cancelada
+                </option>
+
+                <option
+                    value="NO_ASISTIO"
+                    {% if estado_filtro == "NO_ASISTIO" %}
+                        selected
+                    {% endif %}
+                >
+                    No asistió
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- BOTONES -->
+
+        <div class="filter-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Filtrar
+            </button>
+
+            <a
+                href="{% url 'agenda_citas' %}"
+                class="btn btn-secondary"
+            >
+                Limpiar
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- CITAS -->
+
+{% if citas %}
+
+    <div class="table-container">
+
+        <table class="appointments-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Código</th>
+
+                    <th>Fecha</th>
+
+                    <th>Hora</th>
+
+                    <th>Paciente</th>
+
+                    <th>Motivo</th>
+
+                    <th>Estado</th>
+
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for cita in citas %}
+
+                    <tr>
+
+
+                        <!-- CÓDIGO -->
+
+                        <td>
+
+                            <span class="appointment-code">
+                                {{ cita.codigo_cita }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- FECHA -->
+
+                        <td>
+
+                            {{ cita.fecha_cita|date:"d/m/Y" }}
+
+                        </td>
+
+
+                        <!-- HORA -->
+
+                        <td>
+
+                            <span class="appointment-time">
+                                {{ cita.hora_cita|time:"H:i" }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- PACIENTE -->
+
+                        <td>
+
+                            <div class="patient-name">
+
+                                {{ cita.paciente.nombres }}
+                                {{ cita.paciente.apellidos }}
+
+                            </div>
+
+                            <div class="patient-id">
+
+                                {{ cita.paciente.numero_identidad }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- MOTIVO -->
+
+                        <td>
+
+                            <span class="appointment-reason">
+                                {{ cita.motivo|truncatechars:60 }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ESTADO -->
+
+                        <td>
+
+                            {% if cita.estado == "PROGRAMADA" %}
+
+                                <span class="status-badge status-programada">
+                                    Programada
+                                </span>
+
+                            {% elif cita.estado == "CONFIRMADA" %}
+
+                                <span class="status-badge status-confirmada">
+                                    Confirmada
+                                </span>
+
+                            {% elif cita.estado == "COMPLETADA" %}
+
+                                <span class="status-badge status-completada">
+                                    Completada
+                                </span>
+
+                            {% elif cita.estado == "CANCELADA" %}
+
+                                <span class="status-badge status-cancelada">
+                                    Cancelada
+                                </span>
+
+                            {% elif cita.estado == "NO_ASISTIO" %}
+
+                                <span class="status-badge status-no-asistio">
+                                    No asistió
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACCIONES -->
+
+                        <td>
+
+                            <a
+                                href="{% url 'detalle_cita' cita.id %}"
+                                class="btn btn-secondary"
+                            >
+                                Ver detalle
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+{% else %}
+
+
+    <!-- SIN CITAS -->
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            +
+        </div>
+
+        <h3>
+            No hay citas registradas
+        </h3>
+
+        <p>
+            Las citas programadas para las pacientes
+            aparecerán en esta agenda.
+        </p>
+
+    </div>
+
+
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,1012 @@
+{% extends "base.html" %}
+
+{% block title %}
+Gestión de Respaldos | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================
+       ENCABEZADO
+    ========================== */
+
+    .backup-header {
+        margin-bottom: 24px;
+    }
+
+    .backup-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .backup-header p {
+        color: #718096;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+
+    /* ==========================
+       ESTADO GENERAL
+    ========================== */
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .status-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .status-title {
+        color: #718096;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 9px;
+    }
+
+    .status-value {
+        color: #16324f;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .status-description {
+        color: #8a98a5;
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+
+    /* ==========================
+       BADGES
+    ========================== */
+
+    .badge {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 12px;
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .badge-success {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .badge-warning {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+    .badge-danger {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .badge-info {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+
+    /* ==========================
+       CONFIGURACIÓN
+    ========================== */
+
+    .config-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        margin-bottom: 22px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 16px 20px;
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .section-header h2 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .section-header p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .config-item {
+        padding: 17px 20px;
+        border-bottom: 1px solid #edf1f4;
+    }
+
+    .config-item:nth-child(odd) {
+        border-right: 1px solid #edf1f4;
+    }
+
+    .config-label {
+        color: #718096;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .config-value {
+        color: #37474f;
+        font-size: 11px;
+        line-height: 1.5;
+        word-break: break-all;
+    }
+
+
+    /* ==========================
+       ÚLTIMO RESPALDO
+    ========================== */
+
+    .latest-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .latest-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .latest-content {
+        padding: 18px 20px;
+    }
+
+    .backup-name {
+        color: #245b82;
+        font-size: 11px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        word-break: break-all;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 7px 0;
+        border-bottom: 1px solid #edf1f4;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #718096;
+        font-size: 10px;
+    }
+
+    .detail-value {
+        color: #37474f;
+        font-size: 10px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+
+    /* ==========================
+       TABLAS
+    ========================== */
+
+    .backup-table-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        margin-bottom: 22px;
+        overflow: hidden;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .backup-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .backup-table thead {
+        background-color: #f7fafc;
+    }
+
+    .backup-table th {
+        padding: 11px 14px;
+        text-align: left;
+        color: #61717e;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .backup-table td {
+        padding: 13px 14px;
+        color: #37474f;
+        font-size: 11px;
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .backup-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .backup-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .file-name {
+        color: #245b82;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    /* ==========================
+       NOTA DE SEGURIDAD
+    ========================== */
+
+    .security-note {
+        background-color: #f8fafb;
+        border: 1px solid #dce5ea;
+        border-left: 4px solid #245b82;
+        border-radius: 6px;
+        padding: 15px 18px;
+        margin-bottom: 22px;
+    }
+
+    .security-note h3 {
+        color: #16324f;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .security-note p {
+        color: #61717e;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+
+    /* ==========================
+       SIN DATOS
+    ========================== */
+
+    .empty-state {
+        padding: 35px 20px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 10px;
+    }
+
+
+    /* ==========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1100px) {
+
+        .status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .latest-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        .status-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .config-item:nth-child(odd) {
+            border-right: none;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="backup-header">
+
+    <h1>Gestión de Respaldos</h1>
+
+    <p>
+        Supervisión del estado de los respaldos locales,
+        copias externas y política de retención del sistema clínico.
+    </p>
+
+</div>
+
+
+<!-- ESTADO GENERAL -->
+
+<div class="status-grid">
+
+
+    <!-- ÚLTIMO PROCESO -->
+
+    <div class="status-card">
+
+        <div class="status-title">
+            Último proceso
+        </div>
+
+        <div class="status-value">
+
+            {% if proceso_exitoso %}
+
+                <span class="badge badge-success">
+                    EXITOSO
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-warning">
+                    {{ ultimo_resultado }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+        <div class="status-description">
+            Resultado más reciente registrado en el log
+            del proceso automático.
+        </div>
+
+    </div>
+
+
+    <!-- RESPALDO LOCAL -->
+
+    <div class="status-card">
+
+        <div class="status-title">
+            Respaldo local
+        </div>
+
+        <div class="status-value">
+
+            {% if respaldo_local_disponible %}
+
+                <span class="badge badge-success">
+                    Disponible
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-danger">
+                    No disponible
+                </span>
+
+            {% endif %}
+
+        </div>
+
+        <div class="status-description">
+            Disponibilidad del respaldo más reciente
+            almacenado localmente.
+        </div>
+
+    </div>
+
+
+    <!-- COPIA EXTERNA -->
+
+    <div class="status-card">
+
+        <div class="status-title">
+            Copia externa
+        </div>
+
+        <div class="status-value">
+
+            {% if copia_externa_disponible %}
+
+                <span class="badge badge-success">
+                    Disponible
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-danger">
+                    No disponible
+                </span>
+
+            {% endif %}
+
+        </div>
+
+        <div class="status-description">
+            Confirma que el último respaldo también existe
+            en la ubicación externa configurada.
+        </div>
+
+    </div>
+
+
+    <!-- INTEGRIDAD -->
+
+    <div class="status-card">
+
+        <div class="status-title">
+            Verificación de copia
+        </div>
+
+        <div class="status-value">
+
+            {% if copia_externa_mismo_tamano %}
+
+                <span class="badge badge-success">
+                    Coincidente
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-warning">
+                    Pendiente
+                </span>
+
+            {% endif %}
+
+        </div>
+
+        <div class="status-description">
+            Comprobación del tamaño entre el respaldo
+            local y su copia externa.
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- CONFIGURACIÓN -->
+
+<div class="config-card">
+
+    <div class="section-header">
+
+        <h2>Configuración de resiliencia</h2>
+
+        <p>
+            Parámetros actuales utilizados por el sistema de respaldo.
+        </p>
+
+    </div>
+
+
+    <div class="config-grid">
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Política de retención
+            </div>
+
+            <div class="config-value">
+                {{ dias_retencion }} días
+            </div>
+
+        </div>
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Espacio utilizado localmente
+            </div>
+
+            <div class="config-value">
+                {{ total_mb_local|floatformat:2 }} MB
+            </div>
+
+        </div>
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Ubicación local
+            </div>
+
+            <div class="config-value">
+                {{ ruta_local }}
+            </div>
+
+        </div>
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Ubicación externa
+            </div>
+
+            <div class="config-value">
+
+                {% if ubicacion_externa_disponible %}
+
+                    {{ ruta_externa }}
+
+                {% else %}
+
+                    No disponible
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Respaldos locales
+            </div>
+
+            <div class="config-value">
+                {{ total_respaldos_locales }}
+            </div>
+
+        </div>
+
+
+        <div class="config-item">
+
+            <div class="config-label">
+                Respaldos externos
+            </div>
+
+            <div class="config-value">
+                {{ total_respaldos_externos }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- ÚLTIMOS RESPALDOS -->
+
+<div class="latest-grid">
+
+
+    <!-- LOCAL -->
+
+    <div class="latest-card">
+
+        <div class="section-header">
+
+            <h2>Último respaldo local</h2>
+
+            <p>
+                Copia más reciente almacenada en el servidor local.
+            </p>
+
+        </div>
+
+
+        <div class="latest-content">
+
+            {% if ultimo_respaldo_local %}
+
+                <div class="backup-name">
+                    {{ ultimo_respaldo_local.nombre }}
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Fecha
+                    </span>
+
+                    <span class="detail-value">
+                        {{ ultimo_respaldo_local.fecha|date:"d/m/Y H:i:s" }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Tamaño
+                    </span>
+
+                    <span class="detail-value">
+                        {{ ultimo_respaldo_local.tamano_mb|floatformat:2 }} MB
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Estado
+                    </span>
+
+                    <span class="detail-value">
+
+                        <span class="badge badge-success">
+                            Disponible
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Sin respaldo local</h3>
+
+                    <p>
+                        No se encontraron archivos de respaldo.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- EXTERNO -->
+
+    <div class="latest-card">
+
+        <div class="section-header">
+
+            <h2>Última copia externa</h2>
+
+            <p>
+                Copia más reciente localizada en la carpeta de OneDrive.
+            </p>
+
+        </div>
+
+
+        <div class="latest-content">
+
+            {% if ultimo_respaldo_externo %}
+
+                <div class="backup-name">
+                    {{ ultimo_respaldo_externo.nombre }}
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Fecha
+                    </span>
+
+                    <span class="detail-value">
+                        {{ ultimo_respaldo_externo.fecha|date:"d/m/Y H:i:s" }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Tamaño
+                    </span>
+
+                    <span class="detail-value">
+                        {{ ultimo_respaldo_externo.tamano_mb|floatformat:2 }} MB
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Estado
+                    </span>
+
+                    <span class="detail-value">
+
+                        <span class="badge badge-success">
+                            Disponible
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Sin copia externa</h3>
+
+                    <p>
+                        No se encontraron respaldos en la ubicación externa.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- HISTORIAL LOCAL -->
+
+<div class="backup-table-card">
+
+    <div class="section-header">
+
+        <h2>Respaldos locales recientes</h2>
+
+        <p>
+            Últimos archivos de respaldo disponibles localmente.
+        </p>
+
+    </div>
+
+
+    {% if respaldos_locales %}
+
+        <div class="table-container">
+
+            <table class="backup-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Archivo</th>
+                        <th>Fecha</th>
+                        <th>Tamaño</th>
+                        <th>Estado</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for respaldo in respaldos_locales %}
+
+                        <tr>
+
+                            <td>
+                                <span class="file-name">
+                                    {{ respaldo.nombre }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ respaldo.fecha|date:"d/m/Y H:i:s" }}
+                            </td>
+
+                            <td>
+                                {{ respaldo.tamano_mb|floatformat:2 }} MB
+                            </td>
+
+                            <td>
+
+                                <span class="badge badge-success">
+                                    Disponible
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No hay respaldos locales</h3>
+
+            <p>
+                Los respaldos generados aparecerán aquí.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- HISTORIAL EXTERNO -->
+
+<div class="backup-table-card">
+
+    <div class="section-header">
+
+        <h2>Copias externas recientes</h2>
+
+        <p>
+            Últimos archivos encontrados en la ubicación externa configurada.
+        </p>
+
+    </div>
+
+
+    {% if respaldos_externos %}
+
+        <div class="table-container">
+
+            <table class="backup-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Archivo</th>
+                        <th>Fecha</th>
+                        <th>Tamaño</th>
+                        <th>Ubicación</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for respaldo in respaldos_externos %}
+
+                        <tr>
+
+                            <td>
+                                <span class="file-name">
+                                    {{ respaldo.nombre }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ respaldo.fecha|date:"d/m/Y H:i:s" }}
+                            </td>
+
+                            <td>
+                                {{ respaldo.tamano_mb|floatformat:2 }} MB
+                            </td>
+
+                            <td>
+
+                                <span class="badge badge-info">
+                                    OneDrive
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No hay copias externas</h3>
+
+            <p>
+                Las copias enviadas a OneDrive aparecerán aquí.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- NOTA -->
+
+<div class="security-note">
+
+    <h3>Nota de seguridad</h3>
+
+    <p>
+        Este panel supervisa la disponibilidad de los archivos de respaldo.
+        Las operaciones de restauración se mantienen fuera de la interfaz
+        web para reducir el riesgo de restauraciones accidentales sobre la
+        base de datos operativa. La sincronización efectiva con OneDrive
+        Cloud debe verificarse mediante el servicio de OneDrive.
+    </p>
+
+</div>
+
+
+{% endblock %}

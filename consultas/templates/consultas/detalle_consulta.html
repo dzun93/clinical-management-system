@@ -1,0 +1,619 @@
+{% extends "base.html" %}
+
+{% block title %}
+Detalle de consulta | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .consultation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .consultation-identity {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+    }
+
+    .patient-avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+
+        background-color: #dcebf5;
+        color: #245b82;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .consultation-information h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .consultation-information p {
+        color: #718096;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .consultation-code {
+        display: inline-block;
+
+        margin-top: 7px;
+        padding: 5px 10px;
+
+        border-radius: 14px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+
+    /* ==========================
+       RESUMEN
+    ========================== */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 18px 20px;
+    }
+
+    .summary-label {
+        color: #718096;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       CONTENIDO CLÍNICO
+    ========================== */
+
+    .clinical-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .clinical-card {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        overflow: hidden;
+    }
+
+    .clinical-card.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .clinical-card-header {
+        padding: 15px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .clinical-card-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .clinical-card-body {
+        padding: 20px;
+    }
+
+    .clinical-text {
+        color: #37474f;
+        font-size: 14px;
+        line-height: 1.7;
+        white-space: pre-line;
+    }
+
+    .empty-value {
+        color: #9aa7b2;
+        font-size: 13px;
+        font-style: italic;
+    }
+
+
+    /* ==========================
+       SEGUIMIENTO
+    ========================== */
+
+    .follow-up {
+        margin-top: 25px;
+
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        overflow: hidden;
+    }
+
+    .follow-up-header {
+        padding: 15px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .follow-up-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .follow-up-body {
+        padding: 20px;
+    }
+
+    .data-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 15px;
+
+        padding: 13px 0;
+
+        border-bottom: 1px solid #edf1f4;
+    }
+
+    .data-row:last-child {
+        border-bottom: none;
+    }
+
+    .data-label {
+        color: #718096;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .data-value {
+        color: #263238;
+        font-size: 14px;
+    }
+
+
+    @media (max-width: 1000px) {
+
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+
+    @media (max-width: 800px) {
+
+        .consultation-header {
+            flex-direction: column;
+        }
+
+        .clinical-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .clinical-card.full-width {
+            grid-column: auto;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .data-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="consultation-header">
+
+    <div class="consultation-identity">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div class="consultation-information">
+
+            <h1>Consulta Médica</h1>
+
+            <p>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </p>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="consultation-code">
+                {{ consulta.codigo_consulta }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a
+            href="{% url 'editar_consulta' paciente.id consulta.id %}"
+            class="btn btn-primary"
+        >
+            Editar consulta
+        </a>
+
+        <a
+            href="{% url 'lista_consultas' paciente.id %}"
+            class="btn btn-secondary"
+        >
+            Historial
+        </a>
+
+        <a
+            href="{% url 'detalle_expediente' paciente.id %}"
+            class="btn btn-secondary"
+        >
+            Expediente
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- RESUMEN DE LA CONSULTA -->
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Código
+        </div>
+
+        <div class="summary-value">
+            {{ consulta.codigo_consulta }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Fecha
+        </div>
+
+        <div class="summary-value">
+            {{ consulta.fecha_consulta|date:"d/m/Y" }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Hora
+        </div>
+
+        <div class="summary-value">
+            {{ consulta.fecha_consulta|date:"H:i" }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Expediente
+        </div>
+
+        <div class="summary-value">
+            {{ expediente.codigo_expediente }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- INFORMACIÓN CLÍNICA -->
+
+<div class="clinical-grid">
+
+
+    <!-- MOTIVO -->
+
+    <div class="clinical-card full-width">
+
+        <div class="clinical-card-header">
+            <h2>Motivo de consulta</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            <div class="clinical-text">
+                {{ consulta.motivo_consulta }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SÍNTOMAS -->
+
+    <div class="clinical-card">
+
+        <div class="clinical-card-header">
+            <h2>Síntomas</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            {% if consulta.sintomas %}
+
+                <div class="clinical-text">
+                    {{ consulta.sintomas }}
+                </div>
+
+            {% else %}
+
+                <span class="empty-value">
+                    No se registraron síntomas.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- DIAGNÓSTICO -->
+
+    <div class="clinical-card">
+
+        <div class="clinical-card-header">
+            <h2>Diagnóstico</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            <div class="clinical-text">
+                {{ consulta.diagnostico }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRATAMIENTO -->
+
+    <div class="clinical-card">
+
+        <div class="clinical-card-header">
+            <h2>Tratamiento</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            {% if consulta.tratamiento %}
+
+                <div class="clinical-text">
+                    {{ consulta.tratamiento }}
+                </div>
+
+            {% else %}
+
+                <span class="empty-value">
+                    No se registró tratamiento.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- INDICACIONES -->
+
+    <div class="clinical-card">
+
+        <div class="clinical-card-header">
+            <h2>Indicaciones</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            {% if consulta.indicaciones %}
+
+                <div class="clinical-text">
+                    {{ consulta.indicaciones }}
+                </div>
+
+            {% else %}
+
+                <span class="empty-value">
+                    No se registraron indicaciones.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- OBSERVACIONES -->
+
+    <div class="clinical-card full-width">
+
+        <div class="clinical-card-header">
+            <h2>Observaciones</h2>
+        </div>
+
+        <div class="clinical-card-body">
+
+            {% if consulta.observaciones %}
+
+                <div class="clinical-text">
+                    {{ consulta.observaciones }}
+                </div>
+
+            {% else %}
+
+                <span class="empty-value">
+                    No existen observaciones adicionales.
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SEGUIMIENTO -->
+
+<div class="follow-up">
+
+    <div class="follow-up-header">
+        <h2>Seguimiento de la consulta</h2>
+    </div>
+
+    <div class="follow-up-body">
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Próxima cita
+            </div>
+
+            <div class="data-value">
+
+                {% if consulta.proxima_cita %}
+
+                    {{ consulta.proxima_cita|date:"d/m/Y" }}
+
+                {% else %}
+
+                    <span class="empty-value">
+                        No programada
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Registrado por
+            </div>
+
+            <div class="data-value">
+
+                {% if consulta.registrado_por %}
+
+                    {{ consulta.registrado_por.get_full_name|default:consulta.registrado_por.username }}
+
+                {% else %}
+
+                    <span class="empty-value">
+                        Usuario no registrado
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="data-row">
+
+            <div class="data-label">
+                Última actualización
+            </div>
+
+            <div class="data-value">
+                {{ consulta.fecha_actualizacion|date:"d/m/Y H:i" }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

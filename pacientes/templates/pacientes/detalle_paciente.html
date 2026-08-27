@@ -1,0 +1,692 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ paciente.nombres }} {{ paciente.apellidos }} | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================
+       ENCABEZADO DEL PACIENTE
+    ========================== */
+
+    .patient-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .patient-identity {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .patient-avatar {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        background-color: #dcebf5;
+        color: #245b82;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .patient-name h1 {
+        color: #16324f;
+        font-size: 27px;
+        margin-bottom: 5px;
+    }
+
+    .patient-name p {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .patient-status {
+        display: inline-block;
+        background-color: #e7f6ec;
+        color: #267a43;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+
+
+    /* ==========================
+       ACCIONES
+    ========================== */
+
+    .patient-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .patient-actions form {
+        margin: 0;
+    }
+
+
+    /* ==========================
+       NAVEGACIÓN CLÍNICA
+    ========================== */
+
+    .clinical-navigation {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .clinical-module {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 20px;
+        transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+    }
+
+    .clinical-module:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .clinical-module-title {
+        color: #16324f;
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 7px;
+    }
+
+    .clinical-module-description {
+        color: #718096;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .module-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 10px;
+        background-color: #eef2f5;
+        color: #718096;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+    /* ==========================
+       INFORMACIÓN
+    ========================== */
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .info-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .info-card-header {
+        padding: 17px 20px;
+        border-bottom: 1px solid #e1e7ec;
+        background-color: #fafcfd;
+    }
+
+    .info-card-header h2 {
+        color: #16324f;
+        font-size: 15px;
+    }
+
+    .info-card-body {
+        padding: 10px 20px;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 15px;
+
+        padding: 13px 0;
+        border-bottom: 1px solid #edf1f4;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #718096;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .info-value {
+        color: #263238;
+        font-size: 14px;
+    }
+
+    .not-registered {
+        color: #a0aec0;
+        font-style: italic;
+    }
+
+
+    /* ==========================
+       INFORMACIÓN DEL SISTEMA
+    ========================== */
+
+    .system-info {
+        margin-top: 20px;
+    }
+
+    .system-info .info-row {
+        grid-template-columns: 200px 1fr;
+    }
+
+
+    /* ==========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1000px) {
+
+        .clinical-navigation {
+            grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @media (max-width: 750px) {
+
+        .patient-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .info-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ==========================
+     ENCABEZADO
+=========================== -->
+
+<div class="patient-header">
+
+    <div class="patient-identity">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div class="patient-name">
+
+            <h1>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </h1>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="patient-status">
+                Paciente activa
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="patient-actions">
+
+        <a
+            href="{% url 'editar_paciente' paciente.id %}"
+            class="btn btn-primary"
+        >
+            Editar paciente
+        </a>
+
+
+        <a
+            href="{% url 'lista_pacientes' %}"
+            class="btn btn-secondary"
+        >
+            Volver
+        </a>
+
+
+        <form
+            method="POST"
+            action="{% url 'desactivar_paciente' paciente.id %}"
+            onsubmit="return confirm(
+                '¿Está seguro de que desea desactivar esta paciente?'
+            );"
+        >
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-danger"
+            >
+                Desactivar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================
+     MÓDULOS CLÍNICOS
+=========================== -->
+
+<div class="clinical-navigation">
+
+<div class="clinical-module">
+    <div class="clinical-module-title">
+        Expediente Clínico
+    </div>
+
+    <div class="clinical-module-description">
+        Antecedentes, alergias e información clínica
+        general de la paciente.
+    </div>
+
+    {% if paciente.expediente %}
+        <a href="{% url 'detalle_expediente' paciente.id %}" class="btn btn-primary">
+            Ver expediente
+        </a>
+
+    {% else %}
+
+        <a
+            href="{% url 'crear_expediente' paciente.id %}"
+            class="btn btn-primary"
+        >
+            Crear expediente
+        </a>
+
+    {% endif %}
+
+    </div>
+
+
+    <div class="clinical-module">
+
+        <div class="clinical-module-title">
+            Consultas Médicas
+        </div>
+
+        <div class="clinical-module-description">
+            Historial de consultas, diagnósticos,
+            tratamientos y medicamentos.
+        </div>
+
+        <span class="module-status">
+            Próximamente
+        </span>
+
+    </div>
+
+
+    <div class="clinical-module">
+
+        <div class="clinical-module-title">
+            Citas
+        </div>
+
+        <div class="clinical-module-description">
+            Programación y consulta del historial
+            de citas de la paciente.
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
+                <a
+                    href="{% url 'lista_citas_paciente' paciente.id %}"
+                    class="btn btn-secondary"
+                >
+                    Ver citas
+                </a>
+                <a
+                    href="{% url 'crear_cita' paciente.id %}"
+                    class="btn btn-primary"
+                >
+                    + Nueva cita
+                </a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================
+     INFORMACIÓN GENERAL
+=========================== -->
+
+<div class="info-grid">
+
+
+    <!-- DATOS PERSONALES -->
+
+    <div class="info-card">
+
+        <div class="info-card-header">
+            <h2>Información personal</h2>
+        </div>
+
+
+        <div class="info-card-body">
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Número de identidad
+                </div>
+
+                <div class="info-value">
+                    {{ paciente.numero_identidad }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Fecha de nacimiento
+                </div>
+
+                <div class="info-value">
+                    {{ paciente.fecha_nacimiento|date:"d/m/Y" }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Estado civil
+                </div>
+
+                <div class="info-value">
+
+                    {% if paciente.estado_civil %}
+
+                        {{ paciente.estado_civil }}
+
+                    {% else %}
+
+                        <span class="not-registered">
+                            No registrado
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Estado
+                </div>
+
+                <div class="info-value">
+                    Activa
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTACTO -->
+
+    <div class="info-card">
+
+        <div class="info-card-header">
+            <h2>Información de contacto</h2>
+        </div>
+
+
+        <div class="info-card-body">
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Teléfono
+                </div>
+
+                <div class="info-value">
+                    {{ paciente.telefono }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Correo electrónico
+                </div>
+
+                <div class="info-value">
+
+                    {% if paciente.correo_electronico %}
+
+                        {{ paciente.correo_electronico }}
+
+                    {% else %}
+
+                        <span class="not-registered">
+                            No registrado
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Dirección
+                </div>
+
+                <div class="info-value">
+
+                    {% if paciente.direccion %}
+
+                        {{ paciente.direccion }}
+
+                    {% else %}
+
+                        <span class="not-registered">
+                            No registrada
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTACTO EMERGENCIA -->
+
+    <div class="info-card">
+
+        <div class="info-card-header">
+            <h2>Contacto de emergencia</h2>
+        </div>
+
+
+        <div class="info-card-body">
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Nombre
+                </div>
+
+                <div class="info-value">
+
+                    {% if paciente.contacto_emergencia %}
+
+                        {{ paciente.contacto_emergencia }}
+
+                    {% else %}
+
+                        <span class="not-registered">
+                            No registrado
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Teléfono
+                </div>
+
+                <div class="info-value">
+
+                    {% if paciente.telefono_emergencia %}
+
+                        {{ paciente.telefono_emergencia }}
+
+                    {% else %}
+
+                        <span class="not-registered">
+                            No registrado
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INFORMACIÓN DEL REGISTRO -->
+
+    <div class="info-card">
+
+        <div class="info-card-header">
+            <h2>Información del registro</h2>
+        </div>
+
+
+        <div class="info-card-body">
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Código interno
+                </div>
+
+                <div class="info-value">
+                    PAC-{{ paciente.id|stringformat:"06d" }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Fecha de registro
+                </div>
+
+                <div class="info-value">
+                    {{ paciente.fecha_registro|date:"d/m/Y H:i" }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Última actualización
+                </div>
+
+                <div class="info-value">
+                    {{ paciente.fecha_actualizacion|date:"d/m/Y H:i" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

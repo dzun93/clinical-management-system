@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+
+{% block title %}
+Editar expediente clínico | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .form-card {
+        max-width: 1150px;
+    }
+
+    .patient-summary {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background-color: #f7fafc;
+        border: 1px solid #e1e7ec;
+        border-radius: 7px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+    }
+
+    .patient-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #dcebf5;
+        color: #245b82;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 17px;
+    }
+
+    .patient-summary h3 {
+        color: #16324f;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .patient-summary p {
+        color: #718096;
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .record-code {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        background-color: #eef4f8;
+        color: #245b82;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .section-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #16324f;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        color: #34495e;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cfd8e0;
+        border-radius: 5px;
+        font-family: inherit;
+        font-size: 14px;
+        background-color: white;
+        color: #263238;
+        outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #245b82;
+        box-shadow: 0 0 0 3px rgba(36, 91, 130, 0.12);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 95px;
+    }
+
+    .field-help {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .field-error {
+        color: #b42318;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid #e1e7ec;
+        padding-top: 20px;
+    }
+
+    @media (max-width: 800px) {
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>Editar expediente clínico</h1>
+
+    <p>
+        Actualice la información clínica general registrada
+        para la paciente.
+    </p>
+
+</div>
+
+
+<div class="card form-card">
+
+    <!-- PACIENTE -->
+
+    <div class="patient-summary">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div>
+
+            <h3>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </h3>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="record-code">
+                {{ expediente.codigo_expediente }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- ANTECEDENTES -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Antecedentes clínicos
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.antecedentes_personales.id_for_label }}">
+                        Antecedentes personales
+                    </label>
+
+                    {{ formulario.antecedentes_personales }}
+
+                    {% for error in formulario.antecedentes_personales.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.antecedentes_familiares.id_for_label }}">
+                        Antecedentes familiares
+                    </label>
+
+                    {{ formulario.antecedentes_familiares }}
+
+                    {% for error in formulario.antecedentes_familiares.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.antecedentes_quirurgicos.id_for_label }}">
+                        Antecedentes quirúrgicos
+                    </label>
+
+                    {{ formulario.antecedentes_quirurgicos }}
+
+                    {% for error in formulario.antecedentes_quirurgicos.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.alergias.id_for_label }}">
+                        Alergias
+                    </label>
+
+                    {{ formulario.alergias }}
+
+                    <div class="field-help">
+                        Registrar alergias conocidas a medicamentos,
+                        alimentos u otras sustancias.
+                    </div>
+
+                    {% for error in formulario.alergias.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMACIÓN GINECOLÓGICA -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Información ginecológica
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.fum.id_for_label }}">
+                        Fecha de última menstruación (FUM)
+                    </label>
+
+                    {{ formulario.fum }}
+
+                    {% for error in formulario.fum.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.vida_sexual_activa.id_for_label }}">
+                        Vida sexual activa
+                    </label>
+
+                    {{ formulario.vida_sexual_activa }}
+
+                    {% for error in formulario.vida_sexual_activa.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- OBSERVACIONES -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Información adicional
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.observaciones_generales.id_for_label }}">
+                        Observaciones generales
+                    </label>
+
+                    {{ formulario.observaciones_generales }}
+
+                    {% for error in formulario.observaciones_generales.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCIONES -->
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'detalle_expediente' paciente.id %}"
+                class="btn btn-secondary"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar cambios
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

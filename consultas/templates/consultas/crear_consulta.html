@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block title %}
+Nueva consulta médica | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .form-card {
+        max-width: 1150px;
+    }
+
+    .patient-summary {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        background-color: #f7fafc;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 16px 20px;
+        margin-bottom: 28px;
+    }
+
+    .patient-avatar {
+        width: 50px;
+        height: 50px;
+
+        border-radius: 50%;
+
+        background-color: #dcebf5;
+        color: #245b82;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .patient-summary h3 {
+        color: #16324f;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .patient-summary p {
+        color: #718096;
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .record-code {
+        display: inline-block;
+
+        margin-top: 5px;
+        padding: 4px 9px;
+
+        border-radius: 12px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       FORMULARIO
+    ========================== */
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        color: #16324f;
+
+        font-size: 14px;
+        font-weight: bold;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .section-description {
+        color: #718096;
+        font-size: 12px;
+        margin-top: -12px;
+        margin-bottom: 20px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        color: #34495e;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        margin-bottom: 7px;
+    }
+
+    .required {
+        color: #b42318;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+
+        padding: 10px 12px;
+
+        border: 1px solid #cfd8e0;
+        border-radius: 5px;
+
+        background-color: white;
+        color: #263238;
+
+        font-family: inherit;
+        font-size: 14px;
+
+        outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #245b82;
+        box-shadow: 0 0 0 3px rgba(36, 91, 130, 0.12);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    .field-help {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .field-error {
+        color: #b42318;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+
+    /* ==========================
+       ACCIONES
+    ========================== */
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        border-top: 1px solid #e1e7ec;
+        padding-top: 20px;
+    }
+
+
+    @media (max-width: 800px) {
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="page-header">
+
+    <h1>Nueva consulta médica</h1>
+
+    <p>
+        Registre la información correspondiente a la atención
+        médica de la paciente.
+    </p>
+
+</div>
+
+
+<div class="card form-card">
+
+
+    <!-- PACIENTE -->
+
+    <div class="patient-summary">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div>
+
+            <h3>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </h3>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="record-code">
+                {{ expediente.codigo_expediente }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- EVALUACIÓN -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Evaluación clínica
+            </div>
+
+            <p class="section-description">
+                Registre el motivo de atención, síntomas y diagnóstico
+                correspondiente a esta consulta.
+            </p>
+
+
+            <div class="form-grid">
+
+
+                <!-- MOTIVO -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.motivo_consulta.id_for_label }}">
+                        Motivo de consulta
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.motivo_consulta }}
+
+                    {% for error in formulario.motivo_consulta.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- SÍNTOMAS -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.sintomas.id_for_label }}">
+                        Síntomas
+                    </label>
+
+                    {{ formulario.sintomas }}
+
+                    {% for error in formulario.sintomas.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- DIAGNÓSTICO -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.diagnostico.id_for_label }}">
+                        Diagnóstico
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.diagnostico }}
+
+                    {% for error in formulario.diagnostico.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PLAN MÉDICO -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Plan médico
+            </div>
+
+            <p class="section-description">
+                Registre el tratamiento e indicaciones proporcionadas
+                durante la consulta.
+            </p>
+
+
+            <div class="form-grid">
+
+
+                <!-- TRATAMIENTO -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.tratamiento.id_for_label }}">
+                        Tratamiento
+                    </label>
+
+                    {{ formulario.tratamiento }}
+
+                    {% for error in formulario.tratamiento.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- INDICACIONES -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.indicaciones.id_for_label }}">
+                        Indicaciones
+                    </label>
+
+                    {{ formulario.indicaciones }}
+
+                    {% for error in formulario.indicaciones.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEGUIMIENTO -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Seguimiento
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- PRÓXIMA CITA -->
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.proxima_cita.id_for_label }}">
+                        Próxima cita
+                    </label>
+
+                    {{ formulario.proxima_cita }}
+
+                    <div class="field-help">
+                        Campo opcional.
+                    </div>
+
+                    {% for error in formulario.proxima_cita.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- OBSERVACIONES -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ formulario.observaciones }}
+
+                    {% for error in formulario.observaciones.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ERRORES GENERALES -->
+
+        {% if formulario.non_field_errors %}
+
+            <div class="form-section">
+
+                {% for error in formulario.non_field_errors %}
+
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- BOTONES -->
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'lista_consultas' paciente.id %}"
+                class="btn btn-secondary"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar consulta
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% endblock %}

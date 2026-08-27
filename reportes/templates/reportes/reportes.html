@@ -1,0 +1,933 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reportes | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================
+       ENCABEZADO
+    ========================== */
+
+    .reports-header {
+        margin-bottom: 25px;
+    }
+
+    .reports-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .reports-header p {
+        color: #718096;
+        font-size: 13px;
+    }
+
+
+    /* ==========================
+       INDICADORES GENERALES
+    ========================== */
+
+    .reports-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 20px;
+    }
+
+    .summary-label {
+        color: #718096;
+
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .summary-description {
+        color: #8a98a5;
+        font-size: 11px;
+    }
+
+
+    /* ==========================
+       ESTADOS DE CITAS
+    ========================== */
+
+    .appointment-summary {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        margin-bottom: 25px;
+
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 16px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .section-header h2 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .section-header p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+    .appointment-status-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .status-card {
+        padding: 20px;
+
+        text-align: center;
+
+        border-right: 1px solid #edf1f4;
+    }
+
+    .status-card:last-child {
+        border-right: none;
+    }
+
+    .status-number {
+        color: #16324f;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .status-label {
+        color: #718096;
+        font-size: 11px;
+    }
+
+
+    /* ==========================
+       BLOQUES DE REPORTES
+    ========================== */
+
+    .report-section {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        margin-bottom: 25px;
+
+        overflow: hidden;
+    }
+
+    .report-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+
+        padding: 16px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .report-section-header h2 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .report-section-header p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+    .record-count {
+        display: inline-block;
+
+        padding: 5px 9px;
+
+        border-radius: 12px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 10px;
+        font-weight: bold;
+
+        white-space: nowrap;
+    }
+
+
+    /* ==========================
+       TABLAS
+    ========================== */
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .report-table thead {
+        background-color: #f7fafc;
+    }
+
+    .report-table th {
+        padding: 12px 15px;
+
+        text-align: left;
+
+        color: #61717e;
+
+        font-size: 10px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .report-table td {
+        padding: 14px 15px;
+
+        color: #37474f;
+        font-size: 12px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .report-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .primary-text {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .secondary-text {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .record-code {
+        color: #245b82;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       ESTADOS
+    ========================== */
+
+    .status-badge {
+        display: inline-block;
+
+        padding: 4px 8px;
+        border-radius: 11px;
+
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .status-programada {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+    .status-confirmada {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .status-completada {
+        background-color: #e7f4ea;
+        color: #25633c;
+    }
+
+    .status-cancelada {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .status-no-asistio {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+
+    /* ==========================
+       SIN DATOS
+    ========================== */
+
+    .empty-state {
+        padding: 35px 25px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+
+    @media (max-width: 1000px) {
+
+        .reports-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .status-card {
+            border-bottom: 1px solid #edf1f4;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .appointment-status-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .status-card {
+            border-right: none;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="reports-header">
+
+    <h1>Reportes</h1>
+
+    <p>
+        Resumen consolidado de pacientes, consultas médicas
+        y actividad de la agenda.
+    </p>
+
+</div>
+
+
+<!-- INDICADORES GENERALES -->
+
+<div class="reports-summary">
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Pacientes activos
+        </div>
+
+        <div class="summary-value">
+            {{ total_pacientes }}
+        </div>
+
+        <div class="summary-description">
+            Pacientes actualmente registrados en el sistema.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Consultas médicas
+        </div>
+
+        <div class="summary-value">
+            {{ total_consultas }}
+        </div>
+
+        <div class="summary-description">
+            Total de consultas clínicas registradas.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Citas registradas
+        </div>
+
+        <div class="summary-value">
+            {{ total_citas }}
+        </div>
+
+        <div class="summary-description">
+            Total histórico de citas activas en la agenda.
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- ESTADOS DE CITAS -->
+
+<div class="appointment-summary">
+
+    <div class="section-header">
+
+        <h2>Distribución de citas por estado</h2>
+
+        <p>
+            Resumen de la situación actual de las citas registradas.
+        </p>
+
+    </div>
+
+
+    <div class="appointment-status-grid">
+
+
+        <div class="status-card">
+
+            <div class="status-number">
+                {{ citas_programadas }}
+            </div>
+
+            <div class="status-label">
+                Programadas
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-number">
+                {{ citas_confirmadas }}
+            </div>
+
+            <div class="status-label">
+                Confirmadas
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-number">
+                {{ citas_completadas }}
+            </div>
+
+            <div class="status-label">
+                Completadas
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-number">
+                {{ citas_canceladas }}
+            </div>
+
+            <div class="status-label">
+                Canceladas
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-number">
+                {{ citas_no_asistio }}
+            </div>
+
+            <div class="status-label">
+                No asistió
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- PACIENTES -->
+
+<div class="report-section">
+
+    <div class="report-section-header">
+
+        <div>
+
+            <h2>Pacientes recientes</h2>
+
+            <p>
+                Últimas pacientes registradas en el sistema.
+            </p>
+
+        </div>
+
+        <span class="record-count">
+            {{ total_pacientes }} pacientes
+        </span>
+
+    </div>
+
+
+    {% if pacientes %}
+
+        <div class="table-container">
+
+            <table class="report-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Identidad</th>
+                        <th>Teléfono</th>
+                        <th>Fecha de registro</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for paciente in pacientes %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="primary-text">
+
+                                    {{ paciente.nombres }}
+                                    {{ paciente.apellidos }}
+
+                                </div>
+
+                                <div class="secondary-text">
+                                    PAC-{{ paciente.id|stringformat:"06d" }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                {{ paciente.numero_identidad }}
+                            </td>
+
+
+                            <td>
+                                {{ paciente.telefono }}
+                            </td>
+
+
+                            <td>
+                                {{ paciente.fecha_registro|date:"d/m/Y H:i" }}
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{% url 'detalle_paciente' paciente.id %}"
+                                    class="btn btn-secondary"
+                                >
+                                    Ver
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No hay pacientes registrados</h3>
+
+            <p>
+                Los pacientes registrados aparecerán en este reporte.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- CONSULTAS -->
+
+<div class="report-section">
+
+    <div class="report-section-header">
+
+        <div>
+
+            <h2>Consultas médicas recientes</h2>
+
+            <p>
+                Últimas atenciones clínicas registradas.
+            </p>
+
+        </div>
+
+        <span class="record-count">
+            {{ total_consultas }} consultas
+        </span>
+
+    </div>
+
+
+    {% if consultas %}
+
+        <div class="table-container">
+
+            <table class="report-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Paciente</th>
+                        <th>Motivo</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for consulta in consultas %}
+
+                        <tr>
+
+
+                            <td>
+
+                                <span class="record-code">
+                                    {{ consulta.codigo_consulta }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ consulta.fecha_consulta|date:"d/m/Y" }}
+
+                                <div class="secondary-text">
+                                    {{ consulta.fecha_consulta|date:"H:i" }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="primary-text">
+
+                                    {{ consulta.expediente.paciente.nombres }}
+                                    {{ consulta.expediente.paciente.apellidos }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                {{ consulta.motivo_consulta|truncatechars:50 }}
+                            </td>
+
+
+                            <td>
+                                {{ consulta.diagnostico|truncatechars:55 }}
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{% url 'detalle_consulta' consulta.expediente.paciente.id consulta.id %}"
+                                    class="btn btn-secondary"
+                                >
+                                    Ver
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No hay consultas registradas</h3>
+
+            <p>
+                Las consultas médicas aparecerán en este reporte.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- CITAS -->
+
+<div class="report-section">
+
+    <div class="report-section-header">
+
+        <div>
+
+            <h2>Citas recientes</h2>
+
+            <p>
+                Últimas citas registradas en la agenda clínica.
+            </p>
+
+        </div>
+
+        <span class="record-count">
+            {{ total_citas }} citas
+        </span>
+
+    </div>
+
+
+    {% if citas %}
+
+        <div class="table-container">
+
+            <table class="report-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Paciente</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for cita in citas %}
+
+                        <tr>
+
+
+                            <td>
+
+                                <span class="record-code">
+                                    {{ cita.codigo_cita }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ cita.fecha_cita|date:"d/m/Y" }}
+                            </td>
+
+
+                            <td>
+                                {{ cita.hora_cita|time:"H:i" }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="primary-text">
+
+                                    {{ cita.paciente.nombres }}
+                                    {{ cita.paciente.apellidos }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                {{ cita.motivo|truncatechars:50 }}
+                            </td>
+
+
+                            <td>
+
+                                {% if cita.estado == "PROGRAMADA" %}
+
+                                    <span class="status-badge status-programada">
+                                        Programada
+                                    </span>
+
+                                {% elif cita.estado == "CONFIRMADA" %}
+
+                                    <span class="status-badge status-confirmada">
+                                        Confirmada
+                                    </span>
+
+                                {% elif cita.estado == "COMPLETADA" %}
+
+                                    <span class="status-badge status-completada">
+                                        Completada
+                                    </span>
+
+                                {% elif cita.estado == "CANCELADA" %}
+
+                                    <span class="status-badge status-cancelada">
+                                        Cancelada
+                                    </span>
+
+                                {% elif cita.estado == "NO_ASISTIO" %}
+
+                                    <span class="status-badge status-no-asistio">
+                                        No asistió
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{% url 'detalle_cita' cita.id %}"
+                                    class="btn btn-secondary"
+                                >
+                                    Ver
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No hay citas registradas</h3>
+
+            <p>
+                Las citas registradas aparecerán en este reporte.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

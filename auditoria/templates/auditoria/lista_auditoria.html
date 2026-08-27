@@ -1,0 +1,769 @@
+{% extends "base.html" %}
+
+{% block title %}
+Auditoría | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================
+       ENCABEZADO
+    ========================== */
+
+    .audit-header {
+        margin-bottom: 24px;
+    }
+
+    .audit-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .audit-header p {
+        color: #718096;
+        font-size: 12px;
+    }
+
+
+    /* ==========================
+       INDICADORES
+    ========================== */
+
+    .audit-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .summary-label {
+        color: #718096;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
+    }
+
+    .summary-value {
+        color: #16324f;
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    .summary-description {
+        color: #8a98a5;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+
+    /* ==========================
+       FILTROS
+    ========================== */
+
+    .filter-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .filter-card h2 {
+        color: #16324f;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto auto;
+        gap: 10px;
+        align-items: end;
+    }
+
+    .filter-group label {
+        display: block;
+        color: #61717e;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .filter-control {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 9px 10px;
+
+        border: 1px solid #ccd6dd;
+        border-radius: 5px;
+
+        background-color: white;
+        color: #37474f;
+
+        font-size: 11px;
+    }
+
+    .filter-control:focus {
+        outline: none;
+        border-color: #245b82;
+    }
+
+
+    /* ==========================
+       TABLA
+    ========================== */
+
+    .audit-table-card {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 16px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .table-header h2 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .table-header p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .audit-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .audit-table thead {
+        background-color: #f7fafc;
+    }
+
+    .audit-table th {
+        padding: 11px 13px;
+
+        text-align: left;
+
+        color: #61717e;
+        font-size: 9px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+
+        border-bottom: 1px solid #e1e7ec;
+
+        white-space: nowrap;
+    }
+
+    .audit-table td {
+        padding: 13px;
+
+        color: #37474f;
+        font-size: 11px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: top;
+    }
+
+    .audit-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .audit-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .username {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .secondary-text {
+        color: #718096;
+        font-size: 9px;
+        margin-top: 3px;
+    }
+
+    .record-code {
+        color: #245b82;
+        font-size: 10px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .description {
+        min-width: 220px;
+        line-height: 1.5;
+    }
+
+
+    /* ==========================
+       BADGES
+    ========================== */
+
+    .badge {
+        display: inline-block;
+
+        padding: 4px 8px;
+        border-radius: 11px;
+
+        font-size: 8px;
+        font-weight: bold;
+
+        white-space: nowrap;
+    }
+
+    .badge-crear {
+        background-color: #e8f5ee;
+        color: #28764b;
+    }
+
+    .badge-editar {
+        background-color: #eef4f8;
+        color: #245b82;
+    }
+
+    .badge-desactivar {
+        background-color: #fbeaea;
+        color: #a43d3d;
+    }
+
+    .badge-login {
+        background-color: #eeeafa;
+        color: #60489b;
+    }
+
+    .badge-logout {
+        background-color: #fff3df;
+        color: #8a601b;
+    }
+
+
+    /* ==========================
+       SIN REGISTROS
+    ========================== */
+
+    .empty-state {
+        padding: 45px 25px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+
+    /* ==========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1100px) {
+
+        .audit-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .audit-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="audit-header">
+
+    <h1>Auditoría del Sistema</h1>
+
+    <p>
+        Bitácora de trazabilidad de las principales acciones
+        realizadas por los usuarios del sistema.
+    </p>
+
+</div>
+
+
+<!-- INDICADORES -->
+
+<div class="audit-summary">
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Total de eventos
+        </div>
+
+        <div class="summary-value">
+            {{ total_registros }}
+        </div>
+
+        <div class="summary-description">
+            Registros almacenados en la bitácora.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Creaciones
+        </div>
+
+        <div class="summary-value">
+            {{ total_creaciones }}
+        </div>
+
+        <div class="summary-description">
+            Operaciones de creación registradas.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Ediciones
+        </div>
+
+        <div class="summary-value">
+            {{ total_ediciones }}
+        </div>
+
+        <div class="summary-description">
+            Operaciones de actualización registradas.
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Inicios de sesión
+        </div>
+
+        <div class="summary-value">
+            {{ total_autenticaciones }}
+        </div>
+
+        <div class="summary-description">
+            Autenticaciones exitosas registradas.
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- FILTROS -->
+
+<div class="filter-card">
+
+    <h2>Filtros de auditoría</h2>
+
+    <form
+        method="GET"
+        action="{% url 'lista_auditoria' %}"
+        class="filter-form"
+    >
+
+
+        <div class="filter-group">
+
+            <label for="q">
+                Buscar
+            </label>
+
+            <input
+                type="text"
+                id="q"
+                name="q"
+                value="{{ busqueda }}"
+                class="filter-control"
+                placeholder="Usuario, módulo, código, descripción o IP"
+            >
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <label for="accion">
+                Acción
+            </label>
+
+            <select
+                id="accion"
+                name="accion"
+                class="filter-control"
+            >
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for valor, nombre in acciones %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if accion_filtro == valor %}selected{% endif %}
+                    >
+                        {{ nombre }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <label for="modulo">
+                Módulo
+            </label>
+
+            <select
+                id="modulo"
+                name="modulo"
+                class="filter-control"
+            >
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for modulo in modulos_disponibles %}
+
+                    <option
+                        value="{{ modulo }}"
+                        {% if modulo_filtro == modulo %}selected{% endif %}
+                    >
+                        {{ modulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Filtrar
+        </button>
+
+
+        <a
+            href="{% url 'lista_auditoria' %}"
+            class="btn btn-secondary"
+        >
+            Limpiar
+        </a>
+
+
+    </form>
+
+</div>
+
+
+<!-- TABLA DE AUDITORÍA -->
+
+<div class="audit-table-card">
+
+    <div class="table-header">
+
+        <h2>Registro de actividad</h2>
+
+        {% if busqueda or accion_filtro or modulo_filtro %}
+
+            <p>
+                Mostrando los eventos que cumplen con los filtros seleccionados.
+            </p>
+
+        {% else %}
+
+            <p>
+                Eventos registrados en orden cronológico descendente.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    {% if registros %}
+
+        <div class="table-container">
+
+            <table class="audit-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Fecha y hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Módulo</th>
+                        <th>Registro</th>
+                        <th>Dirección IP</th>
+                        <th>Descripción</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for registro in registros %}
+
+                        <tr>
+
+
+                            <!-- FECHA -->
+
+                            <td>
+
+                                <strong>
+                                    {{ registro.fecha_hora|date:"d/m/Y" }}
+                                </strong>
+
+                                <div class="secondary-text">
+                                    {{ registro.fecha_hora|date:"H:i:s" }}
+                                </div>
+
+                            </td>
+
+
+                            <!-- USUARIO -->
+
+                            <td>
+
+                                {% if registro.usuario %}
+
+                                    <div class="username">
+                                        {{ registro.usuario.username }}
+                                    </div>
+
+                                    {% if registro.usuario.get_full_name %}
+
+                                        <div class="secondary-text">
+                                            {{ registro.usuario.get_full_name }}
+                                        </div>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="secondary-text">
+                                        Usuario no disponible
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACCIÓN -->
+
+                            <td>
+
+                                {% if registro.accion == "CREAR" %}
+
+                                    <span class="badge badge-crear">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% elif registro.accion == "EDITAR" %}
+
+                                    <span class="badge badge-editar">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% elif registro.accion == "DESACTIVAR" %}
+
+                                    <span class="badge badge-desactivar">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% elif registro.accion == "INICIAR_SESION" %}
+
+                                    <span class="badge badge-login">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% elif registro.accion == "CERRAR_SESION" %}
+
+                                    <span class="badge badge-logout">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge">
+                                        {{ registro.get_accion_display }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- MÓDULO -->
+
+                            <td>
+                                {{ registro.modulo }}
+                            </td>
+
+
+                            <!-- REGISTRO AFECTADO -->
+
+                            <td>
+
+                                {% if registro.registro %}
+
+                                    <span class="record-code">
+                                        {{ registro.registro }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="secondary-text">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- IP -->
+
+                            <td>
+
+                                {% if registro.direccion_ip %}
+
+                                    {{ registro.direccion_ip }}
+
+                                {% else %}
+
+                                    <span class="secondary-text">
+                                        No disponible
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DESCRIPCIÓN -->
+
+                            <td class="description">
+                                {{ registro.descripcion }}
+                            </td>
+
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No se encontraron registros</h3>
+
+            {% if busqueda or accion_filtro or modulo_filtro %}
+
+                <p>
+                    No existen eventos de auditoría que coincidan
+                    con los filtros seleccionados.
+                </p>
+
+            {% else %}
+
+                <p>
+                    Las acciones realizadas en el sistema
+                    aparecerán aquí automáticamente.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

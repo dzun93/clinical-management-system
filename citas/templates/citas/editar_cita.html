@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}
+Editar cita | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .form-card {
+        max-width: 1050px;
+    }
+
+    .patient-summary {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        background-color: #f7fafc;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 16px 20px;
+        margin-bottom: 28px;
+    }
+
+    .patient-avatar {
+        width: 50px;
+        height: 50px;
+
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #dcebf5;
+        color: #245b82;
+
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .patient-summary h3 {
+        color: #16324f;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .patient-summary p {
+        color: #718096;
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+    .code-badge {
+        display: inline-block;
+
+        margin-top: 5px;
+        margin-right: 5px;
+        padding: 4px 9px;
+
+        border-radius: 12px;
+
+        background-color: #eef4f8;
+        color: #245b82;
+
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       FORMULARIO
+    ========================== */
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        color: #16324f;
+
+        font-size: 14px;
+        font-weight: bold;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .section-description {
+        color: #718096;
+        font-size: 12px;
+
+        margin-top: -12px;
+        margin-bottom: 20px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        color: #34495e;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        margin-bottom: 7px;
+    }
+
+    .required {
+        color: #b42318;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+
+        padding: 10px 12px;
+
+        border: 1px solid #cfd8e0;
+        border-radius: 5px;
+
+        background-color: white;
+        color: #263238;
+
+        font-family: inherit;
+        font-size: 14px;
+
+        outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #245b82;
+        box-shadow: 0 0 0 3px rgba(36, 91, 130, 0.12);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 95px;
+    }
+
+    .field-help {
+        color: #718096;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .field-error {
+        color: #b42318;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+
+    /* ==========================
+       ACCIONES
+    ========================== */
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        border-top: 1px solid #e1e7ec;
+        padding-top: 20px;
+    }
+
+
+    @media (max-width: 800px) {
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <h1>Editar cita</h1>
+
+    <p>
+        Actualice la programación o el estado de la cita.
+    </p>
+
+</div>
+
+
+<div class="card form-card">
+
+
+    <!-- PACIENTE -->
+
+    <div class="patient-summary">
+
+        <div class="patient-avatar">
+            {{ paciente.nombres|first }}{{ paciente.apellidos|first }}
+        </div>
+
+        <div>
+
+            <h3>
+                {{ paciente.nombres }}
+                {{ paciente.apellidos }}
+            </h3>
+
+            <p>
+                Identidad:
+                {{ paciente.numero_identidad }}
+            </p>
+
+            <span class="code-badge">
+                PAC-{{ paciente.id|stringformat:"06d" }}
+            </span>
+
+            <span class="code-badge">
+                {{ cita.codigo_cita }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- PROGRAMACIÓN -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Programación
+            </div>
+
+            <p class="section-description">
+                Modifique la fecha, hora o estado de la cita.
+            </p>
+
+
+            <div class="form-grid">
+
+
+                <!-- FECHA -->
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.fecha_cita.id_for_label }}">
+                        Fecha de la cita
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.fecha_cita }}
+
+                    {% for error in formulario.fecha_cita.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- HORA -->
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.hora_cita.id_for_label }}">
+                        Hora de la cita
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.hora_cita }}
+
+                    {% for error in formulario.hora_cita.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- ESTADO -->
+
+                <div class="form-group">
+
+                    <label for="{{ formulario.estado.id_for_label }}">
+                        Estado
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.estado }}
+
+                    <div class="field-help">
+                        Puede cambiar la cita a programada, confirmada,
+                        completada, cancelada o no asistió.
+                    </div>
+
+                    {% for error in formulario.estado.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMACIÓN -->
+
+        <div class="form-section">
+
+            <div class="section-title">
+                Información de la cita
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- MOTIVO -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.motivo.id_for_label }}">
+                        Motivo de la cita
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ formulario.motivo }}
+
+                    {% for error in formulario.motivo.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- OBSERVACIONES -->
+
+                <div class="form-group full-width">
+
+                    <label for="{{ formulario.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ formulario.observaciones }}
+
+                    {% for error in formulario.observaciones.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ERRORES GENERALES -->
+
+        {% if formulario.non_field_errors %}
+
+            <div class="form-section">
+
+                {% for error in formulario.non_field_errors %}
+
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- BOTONES -->
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'detalle_cita' cita.id %}"
+                class="btn btn-secondary"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar cambios
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% endblock %}

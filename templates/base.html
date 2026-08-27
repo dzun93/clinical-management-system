@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Sistema de Gestión Clínica
+        {% endblock %}
+    </title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f7fa;
+            color: #263238;
+        }
+
+        /* ==========================
+           ESTRUCTURA GENERAL
+        ========================== */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================
+           SIDEBAR
+        ========================== */
+
+        .sidebar {
+            width: 250px;
+            background-color: #16324f;
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .sidebar-header p {
+            margin-top: 7px;
+            color: #b9c8d6;
+            font-size: 12px;
+        }
+
+        .menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            padding: 10px 20px;
+            color: #8fa6ba;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .menu a {
+            display: block;
+            padding: 13px 20px;
+            color: #e7eef5;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .menu a:hover {
+            background-color: #244866;
+        }
+
+        .menu a.activo {
+            background-color: #2c5f85;
+            border-left: 4px solid #ffffff;
+            padding-left: 16px;
+        }
+
+        /* ==========================
+           CONTENIDO PRINCIPAL
+        ========================== */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        /* ==========================
+           BARRA SUPERIOR
+        ========================== */
+
+        .topbar {
+            height: 70px;
+            background-color: white;
+            border-bottom: 1px solid #dde4ea;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #16324f;
+        }
+
+        .topbar-user {
+            text-align: right;
+        }
+
+        .topbar-user strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .topbar-user span {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        /* ==========================
+           ÁREA DE CONTENIDO
+        ========================== */
+
+        .content {
+            padding: 30px;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            color: #16324f;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* ==========================
+           COMPONENTES REUTILIZABLES
+        ========================== */
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e1e7ec;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 17px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #245b82;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #194563;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #b42318;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f1f5f8;
+            color: #34495e;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 2px solid #dce4ea;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e7edf2;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* ==========================
+           RESPONSIVE BÁSICO
+        ========================== */
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+        }
+
+        {% block extra_css %}
+        {% endblock %}
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>Sistema de Gestión Clínica</h2>
+            <p>Consultorio Dra. Bertha Lidia Lean</p>
+        </div>
+
+        <nav class="menu">
+
+            <div class="menu-section">
+                Principal
+            </div>
+
+            <a href="{% url 'dashboard' %}">
+                Dashboard
+            </a>
+
+            <a href="{% url 'lista_pacientes' %}">
+                Pacientes
+            </a>
+
+            <div class="menu-section">
+                Gestión Clínica
+            </div>
+
+{% if user.is_superuser or user.perfil.es_administrador or user.perfil.es_doctora %}
+
+    <a href="{% url 'lista_expedientes' %}" class="sidebar-link">
+        Expedientes Clínicos
+    </a>
+
+    <a href="{% url 'lista_consultas_global' %}" class="sidebar-link">
+        Consultas Médicas
+    </a>
+
+{% endif %}
+
+            <a href="{% url 'agenda_citas' %}">
+                Agenda de Citas
+            </a>
+
+{% if user.is_superuser or user.perfil.es_administrador or user.perfil.es_doctora %}
+            <div class="menu-section">
+                Gestión
+            </div>
+    <a href="{% url 'reportes' %}" class="sidebar-link">
+        Reportes
+    </a>
+
+{% endif %}
+
+{% if user.is_superuser or user.perfil.es_administrador %}
+
+    <a href="{% url 'lista_usuarios' %}" class="sidebar-link">
+        Usuarios
+    </a>
+
+    <a href="{% url 'lista_auditoria' %}" class="sidebar-link">
+        Auditoría
+    </a>
+
+    <a href="{% url 'panel_respaldos' %}" class="sidebar-link">
+        Respaldos
+    </a>
+
+     <a href="{% url 'estado_sistema' %}" class="sidebar-link">
+        Estado del Sistema
+    </a>
+
+{% endif %}
+
+        </nav>
+
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="main">
+
+        <!-- BARRA SUPERIOR -->
+        <header class="topbar">
+
+<div class="topbar">
+
+    <div>
+        Gestión Clínica Integral
+    </div>
+
+    {% if user.is_authenticated %}
+
+        <div style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        ">
+
+            <div style="
+                text-align: right;
+                font-size: 12px;
+                color: #61717e;
+            ">
+
+                <div style="
+                    font-weight: 600;
+                    color: #16324f;
+                ">
+
+                    {% if user.first_name or user.last_name %}
+
+                        {{ user.first_name }}
+                        {{ user.last_name }}
+
+                    {% else %}
+
+                        {{ user.username }}
+
+                    {% endif %}
+
+                </div>
+
+                <div>
+                    @{{ user.username }}
+                </div>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{% url 'logout' %}"
+                style="margin: 0;"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-secondary"
+                >
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+            <div class="topbar-user">
+                <strong>Prototipo del Sistema</strong>
+                <span>Entorno de desarrollo</span>
+            </div>
+
+        </header>
+
+        <!-- CONTENIDO VARIABLE -->
+        <section class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

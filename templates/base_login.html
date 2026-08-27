@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Sistema de Gestión Clínica
+        {% endblock %}
+    </title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+
+            background-color: #f4f7f9;
+
+            color: #37474f;
+
+            min-height: 100vh;
+        }
+
+
+        /* ==========================
+           PANTALLA
+        ========================== */
+
+        .login-layout {
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 30px 20px;
+        }
+
+
+        /* ==========================
+           IDENTIDAD DEL SISTEMA
+        ========================== */
+
+        .system-header {
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .system-logo {
+            width: 58px;
+            height: 58px;
+
+            margin: 0 auto 13px auto;
+
+            border-radius: 50%;
+
+            background-color: #16324f;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+
+        .system-header h1 {
+            color: #16324f;
+
+            font-size: 22px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .system-header p {
+            color: #718096;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ==========================
+           CONTENIDO
+        ========================== */
+
+        .login-content {
+            width: 100%;
+            max-width: 430px;
+        }
+
+
+        /* ==========================
+           BOTONES GENERALES
+        ========================== */
+
+        .btn {
+            display: inline-block;
+
+            padding: 10px 16px;
+
+            border: none;
+            border-radius: 5px;
+
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: background-color 0.2s ease;
+        }
+
+
+        .btn-primary {
+            background-color: #16324f;
+            color: white;
+        }
+
+
+        .btn-primary:hover {
+            background-color: #234968;
+        }
+
+
+        .btn-secondary {
+            background-color: #edf1f4;
+            color: #37474f;
+        }
+
+
+        /* ==========================
+           PIE
+        ========================== */
+
+        .login-footer {
+            margin-top: 25px;
+
+            color: #8a98a5;
+
+            font-size: 9px;
+
+            text-align: center;
+
+            line-height: 1.5;
+        }
+
+
+        {% block extra_css %}
+        {% endblock %}
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <main class="login-layout">
+
+
+        <div class="system-header">
+
+            <div class="system-logo">
+                GC
+            </div>
+
+            <h1>
+                Sistema de Gestión Clínica
+            </h1>
+
+            <p>
+                Consultorio Dra. Bertha Lidia Lean
+            </p>
+
+        </div>
+
+
+        <div class="login-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+
+        <div class="login-footer">
+
+            Sistema de Gestión Clínica Integral<br>
+            Acceso restringido a usuarios autorizados
+
+        </div>
+
+
+    </main>
+
+
+</body>
+
+</html>

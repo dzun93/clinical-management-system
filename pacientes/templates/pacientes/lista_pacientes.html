@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pacientes | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+    .acciones-superiores {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 20px;
+    }
+
+    .resumen-pacientes {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .paciente-link {
+        color: #245b82;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .paciente-link:hover {
+        text-decoration: underline;
+    }
+
+    .identidad {
+        font-family: Consolas, monospace;
+        color: #4a5568;
+    }
+
+    .estado-activo {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 12px;
+        background-color: #e7f6ec;
+        color: #267a43;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .accion-ver {
+        color: #245b82;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .accion-ver:hover {
+        text-decoration: underline;
+    }
+
+    .tabla-contenedor {
+        overflow-x: auto;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 45px 20px;
+        color: #718096;
+    }
+
+    .empty-state h3 {
+        color: #34495e;
+        margin-bottom: 8px;
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Gestión de Pacientes</h1>
+    <p>
+        Registro y administración de las pacientes atendidas en el consultorio.
+    </p>
+</div>
+
+
+<div class="acciones-superiores">
+
+    <div class="resumen-pacientes">
+        Pacientes activos registrados:
+        <strong>{{ pacientes|length }}</strong>
+    </div>
+
+    <a href="{% url 'nuevo_paciente' %}" class="btn btn-primary">
+        + Registrar nueva paciente
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Identidad</th>
+                    <th>Paciente</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for paciente in pacientes %}
+
+                <tr>
+
+                    <td class="identidad">
+                        {{ paciente.numero_identidad }}
+                    </td>
+
+                    <td>
+                        <a
+                            href="{% url 'detalle_paciente' paciente.id %}"
+                            class="paciente-link"
+                        >
+                            {{ paciente.nombres }}
+                            {{ paciente.apellidos }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ paciente.fecha_nacimiento|date:"d/m/Y" }}
+                    </td>
+
+                    <td>
+                        {{ paciente.telefono }}
+                    </td>
+
+                    <td>
+                        <span class="estado-activo">
+                            Activa
+                        </span>
+                    </td>
+
+                    <td>
+                        <a
+                            href="{% url 'detalle_paciente' paciente.id %}"
+                            class="accion-ver"
+                        >
+                            Ver detalle
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+
+                        <div class="empty-state">
+                            <h3>No existen pacientes registrados</h3>
+
+                            <p>
+                                Registre una paciente para comenzar a utilizar
+                                el módulo.
+                            </p>
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

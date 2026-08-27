@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block title %}
+Expedientes Clínicos | Sistema de Gestión Clínica
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+
+        margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+        color: #16324f;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .page-header p {
+        color: #718096;
+        font-size: 12px;
+    }
+
+    .counter-box {
+        background-color: white;
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 12px 18px;
+
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .counter-number {
+        color: #16324f;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .counter-label {
+        color: #718096;
+        font-size: 10px;
+        text-transform: uppercase;
+        margin-top: 3px;
+    }
+
+
+    /* ==========================
+       BUSCADOR
+    ========================== */
+
+    .search-card {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        padding: 16px;
+
+        margin-bottom: 20px;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 1;
+
+        padding: 10px 12px;
+
+        border: 1px solid #ccd6dd;
+        border-radius: 5px;
+
+        font-size: 12px;
+        color: #37474f;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #245b82;
+    }
+
+
+    /* ==========================
+       TABLA
+    ========================== */
+
+    .table-card {
+        background-color: white;
+
+        border: 1px solid #e1e7ec;
+        border-radius: 8px;
+
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 16px 20px;
+
+        background-color: #fafcfd;
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .table-header h2 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .table-header p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .clinical-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .clinical-table thead {
+        background-color: #f7fafc;
+    }
+
+    .clinical-table th {
+        padding: 12px 15px;
+
+        text-align: left;
+
+        color: #61717e;
+
+        font-size: 10px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        border-bottom: 1px solid #e1e7ec;
+    }
+
+    .clinical-table td {
+        padding: 14px 15px;
+
+        color: #37474f;
+        font-size: 12px;
+
+        border-bottom: 1px solid #edf1f4;
+        vertical-align: middle;
+    }
+
+    .clinical-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .clinical-table tbody tr:hover {
+        background-color: #fafcfd;
+    }
+
+    .patient-name {
+        color: #263238;
+        font-weight: 600;
+    }
+
+    .secondary-text {
+        color: #718096;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .record-code {
+        color: #245b82;
+        font-weight: bold;
+        font-size: 11px;
+    }
+
+    .status-active {
+        display: inline-block;
+
+        padding: 4px 8px;
+
+        border-radius: 11px;
+
+        background-color: #e8f5ee;
+        color: #28764b;
+
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+
+    /* ==========================
+       SIN RESULTADOS
+    ========================== */
+
+    .empty-state {
+        padding: 45px 25px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        color: #16324f;
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: #718096;
+        font-size: 11px;
+    }
+
+
+    @media (max-width: 750px) {
+
+        .page-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .search-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .counter-box {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ENCABEZADO -->
+
+<div class="page-header">
+
+    <div>
+
+        <h1>Expedientes Clínicos</h1>
+
+        <p>
+            Consulta y acceso centralizado a los expedientes
+            clínicos registrados en el sistema.
+        </p>
+
+    </div>
+
+
+    <div class="counter-box">
+
+        <div class="counter-number">
+            {{ expedientes|length }}
+        </div>
+
+        <div class="counter-label">
+            Expedientes
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BUSCADOR -->
+
+<div class="search-card">
+
+    <form
+        method="GET"
+        action="{% url 'lista_expedientes' %}"
+        class="search-form"
+    >
+
+        <input
+            type="text"
+            name="q"
+            value="{{ busqueda }}"
+            class="search-input"
+            placeholder="Buscar por nombre, apellido o número de identidad"
+        >
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Buscar
+        </button>
+
+
+        {% if busqueda %}
+
+            <a
+                href="{% url 'lista_expedientes' %}"
+                class="btn btn-secondary"
+            >
+                Limpiar
+            </a>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<!-- TABLA -->
+
+<div class="table-card">
+
+    <div class="table-header">
+
+        <h2>Listado de expedientes</h2>
+
+        {% if busqueda %}
+
+            <p>
+                Resultados encontrados para:
+                <strong>{{ busqueda }}</strong>
+            </p>
+
+        {% else %}
+
+            <p>
+                Expedientes clínicos activos registrados.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    {% if expedientes %}
+
+        <div class="table-container">
+
+            <table class="clinical-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Expediente</th>
+                        <th>Paciente</th>
+                        <th>Identidad</th>
+                        <th>Fecha de apertura</th>
+                        <th>Última actualización</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for expediente in expedientes %}
+
+                        <tr>
+
+                            <td>
+
+                                <span class="record-code">
+                                    {{ expediente.codigo_expediente }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="patient-name">
+
+                                    {{ expediente.paciente.nombres }}
+                                    {{ expediente.paciente.apellidos }}
+
+                                </div>
+
+                                <div class="secondary-text">
+                                    PAC-{{ expediente.paciente.id|stringformat:"06d" }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                {{ expediente.paciente.numero_identidad }}
+                            </td>
+
+
+                            <td>
+                                {{ expediente.fecha_apertura|date:"d/m/Y H:i" }}
+                            </td>
+
+
+                            <td>
+                                {{ expediente.fecha_actualizacion|date:"d/m/Y H:i" }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-active">
+                                    Activo
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{% url 'detalle_expediente' expediente.paciente.id %}"
+                                    class="btn btn-secondary"
+                                >
+                                    Ver expediente
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            {% if busqueda %}
+
+                <h3>No se encontraron expedientes</h3>
+
+                <p>
+                    No existen expedientes que coincidan con
+                    "{{ busqueda }}".
+                </p>
+
+            {% else %}
+
+                <h3>No hay expedientes registrados</h3>
+
+                <p>
+                    Los expedientes clínicos aparecerán aquí
+                    cuando sean creados.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}
