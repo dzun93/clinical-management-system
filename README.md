@@ -81,6 +81,27 @@ This project provides a modern web-based architecture designed to centralize cli
 ---
 
 
+## Screenshots
+
+### Dashboard
+Overview of key clinical activity, including active patients, recent consultations, and appointment status.
+
+![Dashboard](assets/screenshots/dashboard.png)
+
+### Patient Management
+Interface for registering, viewing, and managing patient records within the system.
+
+![Patient Management](assets/screenshots/patients.png)
+
+### Backup Management
+Module for monitoring backup status, retention settings, local and external copies, and recovery support.
+
+![Backup Management](assets/screenshots/backups.png)
+
+
+
+---
+
 
 ## Tech Stack
 
