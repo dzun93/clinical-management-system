@@ -1,4 +1,4 @@
-\# Clinical Management System
+# Clinical Management System
 
 
 
@@ -10,11 +10,11 @@ The project was designed to modernize a clinical workflow that previously depend
 
 
 
-\---
+---
 
 
 
-\## Problem Solved
+## Problem Solved
 
 
 
@@ -22,17 +22,17 @@ The original clinical workflow relied heavily on physical records and a locally 
 
 
 
-\- Dependence on a single local computer
+- Dependence on a single local computer
 
-\- Limited data protection and recovery capabilities
+- Limited data protection and recovery capabilities
 
-\- Manual processes for patient and clinical information
+- Manual processes for patient and clinical information
 
-\- Lack of centralized auditing
+- Lack of centralized auditing
 
-\- Limited control over user access
+- Limited control over user access
 
-\- Risk of data loss due to hardware failure or human error
+- Risk of data loss due to hardware failure or human error
 
 
 
@@ -40,71 +40,71 @@ This project provides a modern web-based architecture designed to centralize cli
 
 
 
-\---
+---
 
 
 
-\## Features
+## Features
 
 
 
-\- Patient registration and management
+- Patient registration and management
 
-\- Clinical record management
+- Clinical record management
 
-\- Medical consultation tracking
+- Medical consultation tracking
 
-\- Appointment scheduling
+- Appointment scheduling
 
-\- User authentication
+- User authentication
 
-\- Role-based access control
+- Role-based access control
 
-\- Audit logging
+- Audit logging
 
-\- System monitoring
+- System monitoring
 
-\- Clinical and administrative reports
+- Clinical and administrative reports
 
-\- PostgreSQL database integration
+- PostgreSQL database integration
 
-\- Database backup creation
+- Database backup creation
 
-\- Backup restoration tools
+- Backup restoration tools
 
-\- Automatic backup management
+- Automatic backup management
 
-\- External backup copy support
-
-
-
-\---
+- External backup copy support
 
 
 
-\## Tech Stack
+---
 
 
 
-\- \*\*Backend:\*\* Python, Django 6.1
-
-\- \*\*Database:\*\* PostgreSQL
-
-\- \*\*Frontend:\*\* HTML, CSS, Django Templates
-
-\- \*\*Database Driver:\*\* psycopg
-
-\- \*\*Environment Management:\*\* python-dotenv
-
-\- \*\*Version Control:\*\* Git and GitHub
+## Tech Stack
 
 
 
-\---
+- **Backend:** Python, Django 6.1
+
+- **Database:** PostgreSQL
+
+- **Frontend:** HTML, CSS, Django Templates
+
+- **Database Driver:** psycopg
+
+- **Environment Management:** python-dotenv
+
+- **Version Control:** Git and GitHub
 
 
 
-\## Project Structure
+---
+
+
+
+## Project Structure
 
 
 
@@ -148,15 +148,15 @@ clinical-management-system/
 
 
 
-\---
+---
 
 
 
-\## Installation
+## Installation
 
 
 
-\### 1. Clone the repository
+### 1. Clone the repository
 
 
 
@@ -170,7 +170,7 @@ cd clinical-management-system
 
 
 
-\### 2. Create a virtual environment
+### 2. Create a virtual environment
 
 
 
@@ -182,7 +182,7 @@ python -m venv venv
 
 
 
-\### 3. Activate the virtual environment
+### 3. Activate the virtual environment
 
 
 
@@ -192,7 +192,7 @@ On Windows:
 
 ```bash
 
-venv\\Scripts\\activate
+venv\Scripts\activate
 
 ```
 
@@ -210,7 +210,7 @@ source venv/bin/activate
 
 
 
-\### 4. Install dependencies
+### 4. Install dependencies
 
 
 
@@ -222,7 +222,7 @@ pip install -r requirements.txt
 
 
 
-\### 5. Configure environment variables
+### 5. Configure environment variables
 
 
 
@@ -236,9 +236,9 @@ Example:
 
 ```env
 
-DJANGO\_SECRET\_KEY=your-secret-key
+DJANGO_SECRET_KEY=your-secret-key
 
-DB\_PASSWORD=your-postgresql-password
+DB_PASSWORD=your-postgresql-password
 
 ```
 
@@ -248,7 +248,7 @@ Do not commit the `.env` file to version control.
 
 
 
-\### 6. Create the PostgreSQL database
+### 6. Create the PostgreSQL database
 
 
 
@@ -258,7 +258,7 @@ Create a PostgreSQL database named:
 
 ```text
 
-gestion\_clinica
+gestion_clinica
 
 ```
 
@@ -270,7 +270,7 @@ The current development configuration expects:
 
 ```text
 
-Database: gestion\_clinica
+Database: gestion_clinica
 
 User: postgres
 
@@ -282,11 +282,11 @@ Port: 5432
 
 
 
-The PostgreSQL password is provided through the `DB\_PASSWORD` environment variable.
+The PostgreSQL password is provided through the `DB_PASSWORD` environment variable.
 
 
 
-\### 7. Apply database migrations
+### 7. Apply database migrations
 
 
 
@@ -298,7 +298,7 @@ python manage.py migrate
 
 
 
-\### 8. Create an administrator account
+### 8. Create an administrator account
 
 
 
@@ -310,7 +310,7 @@ python manage.py createsuperuser
 
 
 
-\### 9. Run the development server
+### 9. Run the development server
 
 
 
@@ -334,11 +334,11 @@ http://127.0.0.1:8000/
 
 
 
-\---
+---
 
 
 
-\## Backup and Recovery
+## Backup and Recovery
 
 
 
@@ -352,17 +352,17 @@ Available commands include:
 
 ```bash
 
-python manage.py crear\_respaldo
+python manage.py crear_respaldo
 
-python manage.py restaurar\_respaldo
+python manage.py restaurar_respaldo
 
-python manage.py verificar\_restauracion
+python manage.py verificar_restauracion
 
-python manage.py limpiar\_respaldos
+python manage.py limpiar_respaldos
 
-python manage.py copiar\_respaldo\_externo
+python manage.py copiar_respaldo_externo
 
-python manage.py ejecutar\_respaldo\_automatico
+python manage.py ejecutar_respaldo_automatico
 
 ```
 
@@ -376,11 +376,11 @@ Backup files themselves are excluded from the Git repository.
 
 
 
-\---
+---
 
 
 
-\## Security
+## Security
 
 
 
@@ -392,17 +392,17 @@ The repository excludes:
 
 
 
-\- `.env` files
+- `.env` files
 
-\- Database files
+- Database files
 
-\- Application logs
+- Application logs
 
-\- Generated backups
+- Generated backups
 
-\- Virtual environments
+- Virtual environments
 
-\- IDE-specific files
+- IDE-specific files
 
 
 
@@ -410,11 +410,11 @@ An `.env.example` file is included to document the required environment variable
 
 
 
-\---
+---
 
 
 
-\## Development Status
+## Development Status
 
 
 
@@ -426,25 +426,25 @@ Current development areas include:
 
 
 
-\- Improving user experience and navigation
+- Improving user experience and navigation
 
-\- Expanding system monitoring
+- Expanding system monitoring
 
-\- Strengthening backup and recovery workflows
+- Strengthening backup and recovery workflows
 
-\- Improving reporting capabilities
+- Improving reporting capabilities
 
-\- Adding automated tests
+- Adding automated tests
 
-\- Preparing the application for production deployment
-
-
-
-\---
+- Preparing the application for production deployment
 
 
 
-\## Future Improvements
+---
+
+
+
+## Future Improvements
 
 
 
@@ -452,31 +452,31 @@ Planned improvements include:
 
 
 
-\- REST API integration
+- REST API integration
 
-\- Expanded automated testing
+- Expanded automated testing
 
-\- Docker containerization
+- Docker containerization
 
-\- Production deployment
+- Production deployment
 
-\- Improved access-control policies
+- Improved access-control policies
 
-\- Enhanced audit reporting
+- Enhanced audit reporting
 
-\- Automated backup scheduling
+- Automated backup scheduling
 
-\- Improved disaster recovery procedures
+- Improved disaster recovery procedures
 
-\- UI and accessibility improvements
-
-
-
-\---
+- UI and accessibility improvements
 
 
 
-\## Project Background
+---
+
+
+
+## Project Background
 
 
 
@@ -492,15 +492,15 @@ It is also maintained as part of my professional software engineering portfolio.
 
 
 
-\---
+---
 
 
 
-\## Author
+## Author
 
 
 
-\*\*Dennis Zuniga\*\*
+**Dennis Zuniga**
 
 
 
@@ -510,15 +510,15 @@ Python · Django · PostgreSQL · SQL · Git
 
 
 
-GitHub: \[dzun93](https://github.com/dzun93)
+GitHub: [dzun93](https://github.com/dzun93)
 
 
 
-\---
+---
 
 
 
-\## Disclaimer
+## Disclaimer
 
 
 
@@ -527,4 +527,5 @@ This repository is intended for educational, portfolio, and software engineering
 
 
 Any data used for development or demonstration should be fictional or anonymized. Real patient information, credentials, database backups, or other confidential information must never be committed to this repository.
+
 
